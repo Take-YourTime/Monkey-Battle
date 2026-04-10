@@ -1,0 +1,19 @@
+# prompt
+plan
+
+# folder
+/.agents
+/.vs
+/.git
+/__pycache__
+/_unuse_material_
+/build
+
+/entities/__pycache__
+/effects/__pycache__
+/states/__pycache__
+
+
+# other
+*.txt
+*.spec
