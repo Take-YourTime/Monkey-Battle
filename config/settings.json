@@ -1,0 +1,32 @@
+{
+  "player": {
+    "life": 50,
+    "max_power": 100,
+    "power_regen": 1,
+    "attack_cost": 30,
+    "damage_taken": {
+      "banana": 5,
+      "monkey": 1,
+      "stone": 1
+    }
+  },
+  "monkey": {
+    "life": 10,
+    "energy_limit": 300,
+    "energy_regen": 1,
+    "moving_range_min": 250,
+    "moving_range_max": 350
+  },
+  "monkey_king": {
+    "life": 50,
+    "energy_limit": 500,
+    "energy_regen": 1
+  },
+  "magician": {
+    "life": 10,
+    "skill_consume_min": 200,
+    "skill_consume_max": 400,
+    "move_times_min": 150,
+    "move_times_max": 500
+  }
+}

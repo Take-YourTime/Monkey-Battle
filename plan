@@ -1,0 +1,26 @@
+Assign work for the Monkey Battle Pygame refactor using 4 specialized agents:
+
+1. Architect
+- Owns main loop, game states, and project structure
+- May modify MonkeyBattle.py, function.py, and new states/core folders
+
+2. Config/Assets
+- Owns config extraction and ResourceManager
+- May modify config files, asset loading code, and resource manager files
+
+3. Gameplay Refactor
+- Owns Player, Enemy, Boss, Projectile, and Effect refactoring
+- May modify only gameplay entity files
+
+4. Performance QA
+- Owns performance review, regression checklist, and safe verification
+- Prefer read-only access unless small verified fixes are needed
+
+Execution order:
+- Phase 1: Architect + Config/Assets in parallel
+- Phase 2: Gameplay Refactor
+- Phase 3: Performance QA
+
+Do not allow overlapping ownership unless explicitly required.
+Preserve gameplay behavior.
+Prioritize safe incremental refactoring.
