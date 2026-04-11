@@ -61,10 +61,7 @@ Monkey Battle/
 ## 🕹️ Controls
 | Key / Input | Action |
 |-------------|--------|
-| Arrow Keys / WASD | Move the player |
 | Left Mouse Button | Shoot |
-| Right Mouse Button | Special skill |
-
 ---
 
 ## 🗒️ Notes
