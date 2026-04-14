@@ -8,6 +8,7 @@ from entities.projectiles import Pencil
 from entities.magician import Magician
 from entities.monkey_king import MonkeyKing
 from entities.monkey import Monkey
+from entities.angel_monkey import AngelMonkey
 from core.resource_manager import ResourceManager, resource_path
 
 LEFT = 1 # left mouse button
@@ -50,6 +51,7 @@ class GameState(StateBase):
         self.bananaHit_group = pygame.sprite.Group()
 
         self.monkey_group = pygame.sprite.Group()
+        self.angelMonkey_group = pygame.sprite.Group()
         self.monkey_BananaHit_group = pygame.sprite.Group()
         self.moneyShowUpSound = ResourceManager.get_instance().get_sound("monkey\\show_up.wav", 0.35)
 
@@ -75,6 +77,9 @@ class GameState(StateBase):
         for _ in range( self.wave[self.index][2] ):
             x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
             self.monkeyKing_group.add( MonkeyKing(x, self.engine.virtual_height - 373) )
+        for _ in range( self.wave[self.index][3] ):
+            x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
+            self.angelMonkey_group.add( AngelMonkey(x, self.engine.virtual_height - 184) )
 
     def exit(self):
         # Stop background music or fade out
@@ -91,7 +96,7 @@ class GameState(StateBase):
 
 
     def update(self):
-        if len(self.magician_group) == 0 and len(self.monkey_group) == 0 and len(self.monkeyKing_group) == 0:
+        if len(self.magician_group) == 0 and len(self.monkey_group) == 0 and len(self.monkeyKing_group) == 0 and len(self.angelMonkey_group) == 0:
             self.index += 1
             if self.index == len(self.wave):
                 pygame.mixer.music.fadeout(500)
@@ -101,11 +106,12 @@ class GameState(StateBase):
                 self.spawn_wave()
 
         # Update
-        self.pencil_group.update([self.magician_group, self.monkeyKing_group, self.monkey_group], [self.stone_group, self.banana_group], self.pencilFolded_group)
+        self.pencil_group.update([self.magician_group, self.monkeyKing_group, self.monkey_group, self.angelMonkey_group], [self.stone_group, self.banana_group], self.pencilFolded_group)
         for magician in self.magician_group:
             magician.update(self.stone_group)
         self.monkeyKing_group.update(self.banana_group, self.bananaHit_group)
         self.monkey_group.update(self.player, self.monkey_BananaHit_group)
+        self.angelMonkey_group.update(self.player, self.monkey_BananaHit_group)
         self.banana_group.update(self.player, self.bananaHit_group)
         self.stone_group.update(self.player)
         self.player.update()
@@ -121,6 +127,7 @@ class GameState(StateBase):
         self.magician_group.draw(surface)
         self.monkeyKing_group.draw(surface)
         self.monkey_group.draw(surface)
+        self.angelMonkey_group.draw(surface)
         self.banana_group.draw(surface)
         self.stone_group.draw(surface)
         

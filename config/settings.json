@@ -17,6 +17,13 @@
     "moving_range_min": 250,
     "moving_range_max": 350
   },
+  "angel_monkey": {
+    "life": 25,
+    "energy_limit": 300,
+    "energy_regen": 1,
+    "moving_range_min": 250,
+    "moving_range_max": 350
+  },
   "monkey_king": {
     "life": 50,
     "energy_limit": 500,
