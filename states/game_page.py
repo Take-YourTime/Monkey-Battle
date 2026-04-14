@@ -27,12 +27,9 @@ class GameState(StateBase):
         super().__init__(engine)
 
     def enter(self):
-        # sound
-        self.shoot_sound = pygame.mixer.Sound(resource_path("shoot.wav")) # main character shoot sound
-
         # load BGM
         rm = ResourceManager.get_instance()
-        pygame.mixer.music.load(resource_path("Motivation.mp3"))
+        pygame.mixer.music.load(resource_path("BGM/Motivation.mp3"))
         pygame.mixer.music.set_volume(0.4 * rm.global_volume)
 
         # load raw background
@@ -57,10 +54,7 @@ class GameState(StateBase):
         self.moneyShowUpSound = ResourceManager.get_instance().get_sound("monkey\\show_up.wav", 0.35)
 
         # monkey magician monkeyKing
-        self.wave = [[2, 1, 0],
-                     [3, 0, 1],
-                     [4, 2, 1],
-                     [5, 3, 2]]
+        self.wave = ResourceManager.get_instance().load_config("config/waves.json")["waves"]
         self.index = 0
         
         # game start setting
@@ -91,7 +85,6 @@ class GameState(StateBase):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
                 if(self.player.power >= 30):
                     self.playerAP.isAPchange = True
-                    self.shoot_sound.play()
                     self.pencil_group.add( Pencil(45, 5, (self.player.rect.centerx + 3, self.player.rect.centery - 10), self.engine.get_mouse_pos()) )
                     self.player.attack()
 
@@ -111,7 +104,7 @@ class GameState(StateBase):
         self.pencil_group.update([self.magician_group, self.monkeyKing_group, self.monkey_group], [self.stone_group, self.banana_group], self.pencilFolded_group)
         for magician in self.magician_group:
             magician.update(self.stone_group)
-        self.monkeyKing_group.update(self.banana_group)
+        self.monkeyKing_group.update(self.banana_group, self.bananaHit_group)
         self.monkey_group.update(self.player, self.monkey_BananaHit_group)
         self.banana_group.update(self.player, self.bananaHit_group)
         self.stone_group.update(self.player)

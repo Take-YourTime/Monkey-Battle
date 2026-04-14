@@ -12,7 +12,7 @@ class Magician(Entity):
         rm = ResourceManager.get_instance()
         settings = rm.load_config("config/settings.json")["magician"]
         
-        raw_image = rm.get_image("magicion.png")
+        raw_image = rm.get_image("magician/magicion.png")
         self.image = pygame.transform.scale(raw_image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.topleft = (WINDOW_WIDTH + 10, random.randint(0, 150))

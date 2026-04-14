@@ -28,9 +28,9 @@ class BananaHit(AnimatedEffect):
         super().__init__()
         rm = ResourceManager.get_instance()
         self.images = [  
-            rm.get_image("banana\\hit0.png"),
-            rm.get_image("banana\\hit1.png"),
-            rm.get_image("banana\\hit2.png")
+            rm.get_image("monkeyKing/banana/hit0.png"),
+            rm.get_image("monkeyKing/banana/hit1.png"),
+            rm.get_image("monkeyKing/banana/hit2.png")
         ]
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -75,8 +75,8 @@ class PencilFolded(pygame.sprite.Sprite):
         super().__init__()
         rm = ResourceManager.get_instance()
         self.raw_images = [
-            rm.get_image("pencil_fold.png"),
-            rm.get_image("pencil_fold_1.png")
+            rm.get_image("player/attack/pencil_fold1.png"),
+            rm.get_image("player/attack/pencil_fold2.png")
         ]
         self.image = pygame.transform.rotate(self.raw_images[randint(0, 1)], angle)
         self.rect = self.image.get_rect()

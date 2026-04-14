@@ -26,7 +26,9 @@ class Player(Entity):
         self.height = self.raw_image.get_height()
         self.life = settings["life"]
         self.power = settings["max_power"]
-        
+
+        self.shoot_sound = rm.get_sound("player/attack/shoot.wav", 0.5) # main character basic attack sound
+
         # font
         self.life_font = pygame.font.SysFont(None, 40)
         self.life_text_surface = self.life_font.render(f"Life: {self.life}", True, WHITE)
@@ -56,6 +58,7 @@ class Player(Entity):
     def attack(self):
         if self.power > 0:
             self.isATK = True
+            self.shoot_sound.play()
             rm = ResourceManager.get_instance()
             settings = rm.load_config("config/settings.json")["player"]
             self.power -= settings["attack_cost"]

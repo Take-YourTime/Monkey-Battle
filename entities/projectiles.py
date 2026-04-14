@@ -10,8 +10,8 @@ class Pencil(Projectile):
     def __init__(self, width, height, location, destination):
         super().__init__()
         rm = ResourceManager.get_instance()
-        self.raw_image = rm.get_image("pencil.png")
-        self.hit_sound = rm.get_sound("hit.wav", 0.5)
+        self.raw_image = rm.get_image("player/attack/pencil.png")
+        self.hit_sound = rm.get_sound("player/attack/hit.wav", 0.5)
         self.image = self.raw_image
         self.angle = 0
         
@@ -70,7 +70,7 @@ class Pencil(Projectile):
                 if self.is_colliding_with(obstacle):
                     pencilFolded_group.add(PencilFolded(self.rect.topleft, self.angle))
                     self.kill()
-                    obstacle.kill()
+                    obstacle.hit()
                     return
 
 
@@ -78,7 +78,7 @@ class Stone(Projectile):
     def __init__(self, width, height, location, destination):
         super().__init__()
         rm = ResourceManager.get_instance()
-        raw_image = rm.get_image("stone.png")
+        raw_image = rm.get_image("magician/stone.png")
         self.image = pygame.transform.scale(raw_image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.topleft = location
@@ -97,23 +97,26 @@ class Stone(Projectile):
             return
             
         if self.is_colliding_with(player):
-            self.kill()
             rm = ResourceManager.get_instance()
             settings = rm.load_config("config/settings.json")["player"]
             player.hurt(settings["damage_taken"]["stone"])
+            self.hit()
+    
+    def hit(self):
+        self.kill()
 
 
 class Banana(Projectile):
-    def __init__(self, location):
+    def __init__(self, location, hit_group):
         super().__init__()
         rm = ResourceManager.get_instance()
-        self.raw_image = rm.get_image("banana\\banana0.png")
+        self.raw_image = rm.get_image("monkeyKing\\banana\\banana0.png")
         self.mask = pygame.mask.from_surface(self.raw_image)
         self.roalingImages = [
-            rm.get_image("banana\\banana0.png"), rm.get_image("banana\\banana1.png"),
-            rm.get_image("banana\\banana2.png"), rm.get_image("banana\\banana3.png"),
-            rm.get_image("banana\\banana4.png"), rm.get_image("banana\\banana5.png"),
-            rm.get_image("banana\\banana6.png"), rm.get_image("banana\\banana7.png")
+            rm.get_image("monkeyKing\\banana\\banana0.png"), rm.get_image("monkeyKing\\banana\\banana1.png"),
+            rm.get_image("monkeyKing\\banana\\banana2.png"), rm.get_image("monkeyKing\\banana\\banana3.png"),
+            rm.get_image("monkeyKing\\banana\\banana4.png"), rm.get_image("monkeyKing\\banana\\banana5.png"),
+            rm.get_image("monkeyKing\\banana\\banana6.png"), rm.get_image("monkeyKing\\banana\\banana7.png")
         ]
         self.image = self.raw_image
         self.images_index = 0
@@ -121,6 +124,7 @@ class Banana(Projectile):
         self.rect = self.image.get_rect()
         self.rect.topleft = location
         self.location = list(location)
+        self.hit_group = hit_group
     
     def update(self, player, bananaHit_group):
         if self.rect.x < -self.width:
@@ -128,11 +132,10 @@ class Banana(Projectile):
             return
             
         if self.is_colliding_with(player):
-            self.kill()
             rm = ResourceManager.get_instance()
             settings = rm.load_config("config/settings.json")["player"]
             player.hurt(settings["damage_taken"]["banana"])
-            bananaHit_group.add(BananaHit(self.rect.topleft))
+            self.hit()
             return
         
         self.location[0] -= 5
@@ -144,3 +147,8 @@ class Banana(Projectile):
         else:
             self.image = self.roalingImages[self.images_index // 5]
             self.images_index += 1
+    
+    def hit(self):
+        self.hit_group.add(BananaHit(self.rect.topleft))
+        self.kill()
+

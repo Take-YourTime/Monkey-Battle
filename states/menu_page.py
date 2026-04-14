@@ -23,12 +23,12 @@ class MenuState(StateBase):
 
     def enter(self):
         # load pictures
-        self.menu_RAWimage = pygame.image.load(resource_path("sunset.jpg")).convert()
+        self.menu_RAWimage = pygame.image.load(resource_path("menu/sunset.jpg")).convert()
         self.menu_image = pygame.transform.scale(self.menu_RAWimage, (self.engine.virtual_width, self.engine.virtual_height))
 
         # load BGM and sound
         rm = ResourceManager.get_instance()
-        pygame.mixer.music.load(resource_path("menu\\JustAnotherMapleLeaf.mp3"))
+        pygame.mixer.music.load(resource_path("BGM/JustAnotherMapleLeaf.mp3"))
         pygame.mixer.music.set_volume(0.5 * rm.global_volume)
 
         # setting variable

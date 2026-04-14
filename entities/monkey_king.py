@@ -40,7 +40,7 @@ class MonkeyKing(Entity):
         self.life = settings["life"]
         self.energy_limit = settings["energy_limit"]
 
-    def update(self, banana_group) -> None:
+    def update(self, banana_group, bananaHit_group) -> None:
         THROW_BANANA_FRAME = 80
         FINAL_FRAME = 100
         if self.keepWalking:
@@ -54,9 +54,9 @@ class MonkeyKing(Entity):
                 self.index += 1
             elif self.index == THROW_BANANA_FRAME: 
                 self.throw_sound.play()
-                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2)) ) )
-                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 + 20)) ) )
-                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 - 20)) ) )
+                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2)), bananaHit_group ) )
+                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 + 20)), bananaHit_group ) )
+                banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 - 20)), bananaHit_group ) )
                 self.image = self.ATKimages[8]
                 self.index += 1
             elif self.index < FINAL_FRAME:
