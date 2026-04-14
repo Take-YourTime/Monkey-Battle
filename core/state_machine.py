@@ -1,6 +1,11 @@
+'''
+This class is used to manage the states of the game.
+    state = { "LOADING" : LoadingState, "MENU" : MenuState, "GAME" : GameState, "END" : EndState }
+We also "call" state as "page".
+'''
 class StateMachine:
     def __init__(self):
-        self.states = {}
+        self.states = {} # store all states
         self.current_state_name = None
         self.current_state = None
 
@@ -8,6 +13,9 @@ class StateMachine:
         self.states[name] = state
 
     def change_state(self, name):
+        if name == self.current_state_name:
+            return
+        
         if self.current_state:
             self.current_state.exit()
         

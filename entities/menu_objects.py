@@ -65,8 +65,8 @@ class Button(pygame.sprite.Sprite):
         
 
 
-    def update(self) -> None:
-        if self.rect.collidepoint( pygame.mouse.get_pos() ):
+    def update(self, mouse_pos) -> None:
+        if self.rect.collidepoint( mouse_pos ):
             if self.isCollideMouse == False:
                 self.isCollideMouse = True
                 #self.font.set_italic(True)

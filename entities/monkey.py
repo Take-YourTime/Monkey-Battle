@@ -5,8 +5,6 @@ from entities.base import Entity
 from effects.animations import Monkey_BananaHit
 
 class Monkey(Entity):
-
-
     def __init__(self, location_x, location_y) -> None:
         super().__init__()
         rm = ResourceManager.get_instance()
@@ -26,11 +24,11 @@ class Monkey(Entity):
         self.mask = pygame.mask.from_surface(self.raw_image)
 
         self.image = self.raw_image
-        self.index = 0
+        self.index = 0 # frame index
         self.x_moving_destination = randint(settings["moving_range_min"], settings["moving_range_max"])
         self.isATK = False
         self.keepWalking = True
-        self.energy = settings["energy_limit"]
+        self.energy = settings["energy_limit"] # need energy to attack or use skills
         
         self.rect = self.image.get_rect()
         self.rect.topleft = (location_x, location_y)
@@ -49,33 +47,39 @@ class Monkey(Entity):
             if self.index < THROW_BANANA_FRAME:
                 self.image = self.ATKimages[self.index // 20]
                 self.index += 1
+
             elif self.index == THROW_BANANA_FRAME:
                 rm = ResourceManager.get_instance()
                 hit_face_sound = rm.get_sound("monkey\\banana\\banana_hit_face.wav", 0.5)
-                hit_face_sound.play()
                 monkey_BananaHit_group.add( Monkey_BananaHit(player.rect.centerx - 30, player.rect.top + 60) )
-                player.hurt(1)
+                player.hurt(1) # throw banana at player (always hit)
+                hit_face_sound.play()
                 self.index += 1
+
             elif self.index < FINAL_FRAME:
                 self.image = self.ATKimages[self.index // 20]
                 self.index += 1
+
             else:
                 self.image = self.raw_image
                 self.isATK = False
                 self.index = 0
-        elif self.energy >= 300: 
+        elif self.energy >= 300:
             self.attack()
             self.energy = 0
         else:
             self.energy += 1
     
+
+    # monkey attack
     def attack(self):
         self.isATK = True
 
+    # monkey moving to the left
     def moving(self):
         if self.rect.left > self.x_moving_destination:
             self.index += 1
-            if self.index == 90:
+            if self.index >= 90:
                 self.index = 0
                 self.image = self.raw_image
             elif self.index >= 70:

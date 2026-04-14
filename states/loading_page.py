@@ -31,4 +31,4 @@ class LoadingState(StateBase):
     def draw(self, surface):
         start_text_surface = self.start_font.render("Press space to start the game!", True, (self.start_color, self.start_color, self.start_color))
         surface.fill(BLACK)
-        surface.blit(start_text_surface, (100, self.engine.window_height / 2))
+        surface.blit(start_text_surface, (100, self.engine.virtual_height / 2))

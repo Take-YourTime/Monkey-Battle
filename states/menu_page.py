@@ -23,7 +23,7 @@ class MenuState(StateBase):
     def enter(self):
         # load pictures
         self.menu_RAWimage = pygame.image.load(resource_path("sunset.jpg")).convert()
-        self.menu_image = pygame.transform.scale(self.menu_RAWimage, (self.engine.window_width, self.engine.window_height))
+        self.menu_image = pygame.transform.scale(self.menu_RAWimage, (self.engine.virtual_width, self.engine.virtual_height))
 
         # load BGM and sound
         pygame.mixer.music.load(resource_path("menu\\JustAnotherMapleLeaf.mp3"))
@@ -52,7 +52,7 @@ class MenuState(StateBase):
         self.button_group.add(self.setting_button)
         self.button_group.add(self.exit_button)
         self.star_group = pygame.sprite.Group()
-        self.star_group.add(Star((self.engine.window_width, 0)))
+        self.star_group.add(Star((self.engine.virtual_width, 0)))
 
         # play menu BGM
         pygame.mixer.music.play(-1)
@@ -74,14 +74,14 @@ class MenuState(StateBase):
                     pygame.quit()
                     sys.exit()
                 else:
-                    self.star_group.add(Star((self.engine.window_width, 0)))
-            elif event.type == pygame.VIDEORESIZE:
-                self.menu_image = pygame.transform.scale(self.menu_RAWimage, (self.engine.window_width, self.engine.window_height))
+                    self.star_group.add(Star((self.engine.virtual_width, 0)))
+
+
 
     def update(self):
         if self.frame == 100:
-            self.star_group.add(Star((self.engine.window_width, 0)))
-            self.star_group.add(Star((self.engine.window_width, 0)))
+            self.star_group.add(Star((self.engine.virtual_width, 0)))
+            self.star_group.add(Star((self.engine.virtual_width, 0)))
             self.frame = 0
         else:
             self.frame += 1
@@ -96,7 +96,7 @@ class MenuState(StateBase):
                 self.battleText_color_detect = True
 
         self.star_group.update()
-        self.button_group.update()
+        self.button_group.update(self.engine.get_mouse_pos())
 
     def draw(self, surface):
         surface.fill(BLACK)

@@ -10,8 +10,9 @@ from entities.monkey_king import MonkeyKing
 from entities.monkey import Monkey
 from core.resource_manager import ResourceManager, resource_path
 
-LEFT = 1
+LEFT = 1 # left mouse button
 
+'''blit image that with opacity'''
 def blit_alpha(target, source, location, opacity): # window 圖片 位置 透明度
     x = location[0]
     y = location[1]
@@ -27,16 +28,16 @@ class GameState(StateBase):
 
     def enter(self):
         # sound
-        self.shoot_sound = pygame.mixer.Sound(resource_path("shoot.wav"))
+        self.shoot_sound = pygame.mixer.Sound(resource_path("shoot.wav")) # main character shoot sound
 
         # load BGM
         pygame.mixer.music.load(resource_path("Motivation.mp3"))
         pygame.mixer.music.set_volume(0.4)
 
-        # load background
+        # load raw background
         self.background = pygame.image.load(resource_path("school.png")).convert_alpha()
         
-        self.player = Player(70, self.engine.window_height-273)
+        self.player = Player(70, self.engine.virtual_height-273)
         self.playerAP = AP((100, 200))
 
         # sprites group
@@ -71,14 +72,14 @@ class GameState(StateBase):
         self.moneyShowUpSound.play() # play monkey show up sound
 
         for _ in range( self.wave[self.index][0] ):
-            x = random.randint(self.engine.window_width, self.engine.window_width + 150)
-            self.monkey_group.add( Monkey(x, self.engine.window_height - 176) )
+            x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
+            self.monkey_group.add( Monkey(x, self.engine.virtual_height - 176) )
         for _ in range( self.wave[self.index][1] ):
             new_magician = Magician(100, 100)
             self.magician_group.add( new_magician )
         for _ in range( self.wave[self.index][2] ):
-            x = random.randint(self.engine.window_width, self.engine.window_width + 150)
-            self.monkeyKing_group.add( MonkeyKing(x, self.engine.window_height - 373) )
+            x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
+            self.monkeyKing_group.add( MonkeyKing(x, self.engine.virtual_height - 373) )
 
     def exit(self):
         # Stop background music or fade out
@@ -90,8 +91,10 @@ class GameState(StateBase):
                 if(self.player.power >= 30):
                     self.playerAP.isAPchange = True
                     self.shoot_sound.play()
-                    self.pencil_group.add( Pencil(45, 5, (self.player.rect.centerx + 3, self.player.rect.centery - 10), (pygame.mouse.get_pos())) )
+                    self.pencil_group.add( Pencil(45, 5, (self.player.rect.centerx + 3, self.player.rect.centery - 10), self.engine.get_mouse_pos()) )
                     self.player.attack()
+
+
 
     def update(self):
         if len(self.magician_group) == 0 and len(self.monkey_group) == 0 and len(self.monkeyKing_group) == 0:
