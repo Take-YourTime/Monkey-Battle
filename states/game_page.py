@@ -31,8 +31,9 @@ class GameState(StateBase):
         self.shoot_sound = pygame.mixer.Sound(resource_path("shoot.wav")) # main character shoot sound
 
         # load BGM
+        rm = ResourceManager.get_instance()
         pygame.mixer.music.load(resource_path("Motivation.mp3"))
-        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.set_volume(0.4 * rm.global_volume)
 
         # load raw background
         self.background = pygame.image.load(resource_path("school.png")).convert_alpha()

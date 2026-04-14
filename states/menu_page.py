@@ -1,7 +1,8 @@
 import pygame
 import sys
 from states.base import StateBase
-from entities.menu_objects import Button, Title, Star
+from entities.menu_objects import Button, Title, Star, VolumeSlider
+from core.resource_manager import ResourceManager, resource_path
 from function import BLACK
 from core.resource_manager import resource_path
 
@@ -26,8 +27,9 @@ class MenuState(StateBase):
         self.menu_image = pygame.transform.scale(self.menu_RAWimage, (self.engine.virtual_width, self.engine.virtual_height))
 
         # load BGM and sound
+        rm = ResourceManager.get_instance()
         pygame.mixer.music.load(resource_path("menu\\JustAnotherMapleLeaf.mp3"))
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(0.5 * rm.global_volume)
 
         # setting variable
         self.opacity = 0
@@ -37,13 +39,18 @@ class MenuState(StateBase):
         self.battleText_color = 255
         self.battleText_color_detect = True
 
-        # button
-        vw = self.engine.virtual_width
-        vh = self.engine.virtual_height
+        # virtual size
+        vw = self.engine.virtual_width # virtual widht
+        vh = self.engine.virtual_height # virtual height
         
-        self.start_button = Button((int(vw * (800 / 1280)), int(vh * (220 / 720))), 238, 75, "START", 90)
-        self.setting_button = Button((int(vw * (800 / 1280)), int(vh * (330 / 720))), 228, 58, "SETTING", 66)
-        self.exit_button = Button((int(vw * (800 / 1280)), int(vh * (420 / 720))), 120, 58, "EXIT", 66)
+        # button
+        self.start_button = Button((int(vw * (800 / 1280)), int(vh * (220 / 720))), 228, 75, "START", 65)
+        self.setting_button = Button((int(vw * (800 / 1280)), int(vh * (330 / 720))), 228, 58, "SETTING", 50)
+        self.exit_button = Button((int(vw * (800 / 1280)), int(vh * (420 / 720))), 228, 58, "EXIT", 50)
+
+        # Slider
+        self.volume_slider = VolumeSlider((vw - 250, vh - 60), 200, 20)
+        self.volume_slider.volume = ResourceManager.get_instance().global_volume
 
         # Title
         self.tilte_monkey = Title((int(vw * (150 / 1280)), int(vh * (200 / 720))), "Monkey", 120)
@@ -70,13 +77,19 @@ class MenuState(StateBase):
 
     def handle_events(self, events):
         for event in events:
+            # Volume slider event handling
+            if self.volume_slider.handle_event(event, self.engine.get_mouse_pos()):
+                rm = ResourceManager.get_instance()
+                rm.set_global_volume(self.volume_slider.volume)
+                pygame.mixer.music.set_volume(0.5 * self.volume_slider.volume)
+
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
                 if self.start_button.isCollideMouse == True:
                     self.engine.state_machine.change_state("GAME")
                 elif self.exit_button.isCollideMouse == True:
                     pygame.quit()
                     sys.exit()
-                else:
+                elif not self.volume_slider.is_dragging:
                     self.star_group.add(Star((self.engine.virtual_width, 0)))
 
 
@@ -118,3 +131,4 @@ class MenuState(StateBase):
         
         self.tilte_monkey.draw(255, surface)
         self.tilte_battle.draw(self.battleText_color, surface)
+        self.volume_slider.draw(surface)

@@ -22,7 +22,16 @@ class ResourceManager:
             self._images = {}
             self._sounds = {}
             self._config = {}
+            self.global_volume = 1.0
+            self._sound_base_volumes = {}
             ResourceManager._instance = self
+
+    def set_global_volume(self, vol):
+        self.global_volume = max(0.0, min(1.0, vol))
+        # 只要有一調動全域，將快取過的所有 sound 依據自身原始體質通通重算並套用
+        for filepath, sound in self._sounds.items():
+            base_vol = self._sound_base_volumes.get(filepath, 1.0)
+            sound.set_volume(base_vol * self.global_volume)
 
     @classmethod
     def get_instance(cls):
@@ -48,6 +57,7 @@ class ResourceManager:
         if filepath not in self._sounds:
             full_path = resource_path(filepath)
             sound = pygame.mixer.Sound(full_path)
-            sound.set_volume(volume)
+            sound.set_volume(volume * self.global_volume)
             self._sounds[filepath] = sound
+            self._sound_base_volumes[filepath] = volume
         return self._sounds[filepath]
