@@ -1,5 +1,6 @@
 import pygame
 from core.resource_manager import ResourceManager
+from function import WINDOW_WIDTH
 from entities.base import Entity
 from entities.projectiles import Banana
 
@@ -75,7 +76,7 @@ class MonkeyKing(Entity):
         self.isATK = True
 
     def walking(self):
-        if self.rect.left > 700:
+        if self.rect.left > WINDOW_WIDTH * (700.0 / 1280.0):
             self.rect.left -= 1
             self.index += 1
 

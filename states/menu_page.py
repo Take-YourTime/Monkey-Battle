@@ -38,13 +38,16 @@ class MenuState(StateBase):
         self.battleText_color_detect = True
 
         # button
-        self.start_button = Button((800, 220), 238, 75, "START", 90)
-        self.setting_button = Button((800, 330), 228, 58, "SETTING", 66)
-        self.exit_button = Button((800, 420), 120, 58, "EXIT", 66)
+        vw = self.engine.virtual_width
+        vh = self.engine.virtual_height
+        
+        self.start_button = Button((int(vw * (800 / 1280)), int(vh * (220 / 720))), 238, 75, "START", 90)
+        self.setting_button = Button((int(vw * (800 / 1280)), int(vh * (330 / 720))), 228, 58, "SETTING", 66)
+        self.exit_button = Button((int(vw * (800 / 1280)), int(vh * (420 / 720))), 120, 58, "EXIT", 66)
 
         # Title
-        self.tilte_monkey = Title((150, 200), "Monkey", 120)
-        self.tilte_battle = Title((250, 350), "Battle", 120)
+        self.tilte_monkey = Title((int(vw * (150 / 1280)), int(vh * (200 / 720))), "Monkey", 120)
+        self.tilte_battle = Title((int(vw * (250 / 1280)), int(vh * (350 / 720))), "Battle", 120)
 
         # group
         self.button_group = pygame.sprite.Group()

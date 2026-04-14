@@ -1,6 +1,7 @@
 import pygame
 import sys
 from core.state_machine import StateMachine
+from function import WINDOW_WIDTH, WINDOW_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT
 
 class GameEngine:
     def __init__(self):
@@ -10,8 +11,8 @@ class GameEngine:
         pygame.font.init()
 
         # original window size
-        self.window_width = 1366
-        self.window_height = 768
+        self.window_width = WINDOW_WIDTH
+        self.window_height = WINDOW_HEIGHT
 
         # game fps
         self.fps = 120
@@ -27,8 +28,8 @@ class GameEngine:
         self.state_machine = StateMachine()
 
         # Virtual Canvas
-        self.virtual_width = 1280
-        self.virtual_height = 720
+        self.virtual_width = VIRTUAL_WIDTH
+        self.virtual_height = VIRTUAL_HEIGHT
         self.canvas = pygame.Surface((self.virtual_width, self.virtual_height))
 
         # the real game screen (not window) display size
