@@ -12,14 +12,16 @@ class LoadingState(StateBase):
     def enter(self):
         pass
 
-    def update(self):
+    def update(self, delta):
+        speed = 240 * delta # 2 per frame at 120fps = 240/s
         if self.start_color_detect == True:
-            self.start_color -= 2
+            self.start_color -= speed
             if self.start_color < 100:
                 self.start_color_detect = False
         else:
-            self.start_color += 2
+            self.start_color += speed
             if self.start_color >= 255:
+                self.start_color = 255
                 self.start_color_detect = True
 
     def handle_events(self, events):

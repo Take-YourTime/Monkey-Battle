@@ -8,9 +8,17 @@ WINDOW_HEIGHT = 768
 VIRTUAL_WIDTH = 1280
 VIRTUAL_HEIGHT = 720
 
+REFERENCE_FPS = 120  # 基準幀率，所有動畫速度以此為基準換算
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+
+'''blit image that with opacity (optimized for Pygame 2.x)'''
+def blit_alpha(target, source, location, opacity): # window 圖片 位置 透明度
+    temp = source.copy()
+    temp.set_alpha(opacity)
+    target.blit(temp, location)
 
 
 # 傳入 A(x0, y0) B(x1, y1)兩個座標

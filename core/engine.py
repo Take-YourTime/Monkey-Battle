@@ -15,7 +15,8 @@ class GameEngine:
         self.window_height = WINDOW_HEIGHT
 
         # game fps
-        self.fps = 120
+        self.fps = 60
+        self.delta_time = 1.0 / self.fps  # delta time in seconds (default for first frame)
 
         # load window surface
         self.window_surface = pygame.display.set_mode((self.window_width, self.window_height), pygame.RESIZABLE)
@@ -71,7 +72,10 @@ class GameEngine:
 
     ''' main game loop '''
     def run(self):
+        resize = bool() # Flag: resize window or not
+
         while self.running:
+            resize = False
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
@@ -79,19 +83,26 @@ class GameEngine:
                 elif event.type == pygame.VIDEORESIZE:
                     self.window_width, self.window_height = self.window_surface.get_size()
                     self.update_view_rect()
-
+                    resize = True
+            
+            
             self.state_machine.handle_events(events)
-            self.state_machine.update()
+            self.state_machine.update(self.delta_time)
             
             # draw game screen
             self.state_machine.draw(self.canvas)
-            
+
+            # scale game screen to window size
+            if resize:
+                scaled_canvas = pygame.transform.smoothscale(self.canvas, self.view_rect.size)
+            else:
+                scaled_canvas = pygame.transform.scale(self.canvas, self.view_rect.size)
             self.window_surface.fill((0, 0, 0)) # BLACK border
-            scaled_canvas = pygame.transform.smoothscale(self.canvas, self.view_rect.size)
             self.window_surface.blit(scaled_canvas, self.view_rect.topleft)
 
             pygame.display.update()
-            self.main_clock.tick(self.fps)
+            dt_ms = self.main_clock.tick(self.fps)
+            self.delta_time = min(dt_ms / 1000.0, 0.1)  # seconds, capped at 100ms to prevent spiral
 
         pygame.quit()
         sys.exit()

@@ -7,22 +7,23 @@
     "damage_taken": {
       "banana": 5,
       "monkey": 1,
-      "stone": 1
+      "stone": 1,
+      "seed": 1
     }
   },
   "monkey": {
+    "life": 5,
+    "energy_limit": 300,
+    "energy_regen": 1,
+    "moving_range_min": 200,
+    "moving_range_max": 360
+  },
+  "angel_monkey": {
     "life": 10,
     "energy_limit": 300,
     "energy_regen": 1,
     "moving_range_min": 250,
-    "moving_range_max": 350
-  },
-  "angel_monkey": {
-    "life": 25,
-    "energy_limit": 300,
-    "energy_regen": 1,
-    "moving_range_min": 250,
-    "moving_range_max": 350
+    "moving_range_max": 400
   },
   "monkey_king": {
     "life": 50,
@@ -35,5 +36,40 @@
     "skill_consume_max": 400,
     "move_times_min": 150,
     "move_times_max": 500
+  },
+  "big_white_monkey": {
+    "life": 10,
+    "energy_limit": 400,
+    "energy_regen": 1,
+    "moving_range_min": 250,
+    "moving_range_max": 350,
+    "seed_directions": [
+      {
+        "vx": -5.9087,
+        "vy": 1.0427,
+        "angle": 10.008
+      },
+      {
+        "vx": -6.0,
+        "vy": 0.0,
+        "angle": 0.0
+      },
+      {
+        "vx": -5.9087,
+        "vy": -1.0427,
+        "angle": -10.008
+      },
+      {
+        "vx": -6.0,
+        "vy": 0.0,
+        "angle": 0.0
+      },
+      {
+        "vx": -5.9087,
+        "vy": 1.0427,
+        "angle": 10.008
+      }
+    ],
+    "jump_attack_damage": 2
   }
 }

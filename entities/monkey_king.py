@@ -1,6 +1,6 @@
+from function import VIRTUAL_WIDTH, REFERENCE_FPS
 import pygame
 from core.resource_manager import ResourceManager
-from function import WINDOW_WIDTH
 from entities.base import Entity
 from entities.projectiles import Banana
 
@@ -16,7 +16,7 @@ class MonkeyKing(Entity):
         self.throw_sound = rm.get_sound("monkeyKing\\throw.wav", 0.6)
 
         self.image = self.raw_image
-        self.index = 0
+        self.index = 0.0
         self.ATKimages = [
             rm.get_image("monkeyKing\\monkey_boss_attack0.png"), rm.get_image("monkeyKing\\monkey_boss_attack1.png"), 
             rm.get_image("monkeyKing\\monkey_boss_attack2.png"), rm.get_image("monkeyKing\\monkey_boss_attack3.png"),
@@ -25,7 +25,7 @@ class MonkeyKing(Entity):
             rm.get_image("monkeyKing\\monkey_boss_attack8.png"), rm.get_image("monkeyKing\\monkey_boss_attack9.png")
         ]
         self.isATK = False
-        self.energy = 300
+        self.energy = 300.0
         self.walkingImages = [  
             rm.get_image("monkeyKing\\walking1.png"), rm.get_image("monkeyKing\\walking2.png"),
             rm.get_image("monkeyKing\\walking3.png"), rm.get_image("monkeyKing\\walking4.png"),
@@ -34,57 +34,68 @@ class MonkeyKing(Entity):
         self.keepWalking = True
         self.rect = self.image.get_rect()
         self.rect.topleft = (location_x, location_y)
+        self.x = float(location_x)
         self.mask = pygame.mask.from_surface(self.raw_image)
         self.width = self.raw_image.get_width()
         self.height = self.raw_image.get_height()
         self.life = settings["life"]
         self.energy_limit = settings["energy_limit"]
+        self._atk_sound_played = False
+        self._banana_thrown = False
 
-    def update(self, banana_group, bananaHit_group) -> None:
+    def update(self, delta_time, banana_group, bananaHit_group) -> None:
+        time_step = delta_time * REFERENCE_FPS
         THROW_BANANA_FRAME = 80
         FINAL_FRAME = 100
         if self.keepWalking:
-            self.walking()
+            self.walking(time_step)
         elif self.isATK:
-            if self.index == 0:
+            if not self._atk_sound_played:
+                self._atk_sound_played = True
                 self.skill_sound.play()
-                self.index += 1
-            elif self.index < THROW_BANANA_FRAME :
-                self.image = self.ATKimages[self.index // 10]
-                self.index += 1
-            elif self.index == THROW_BANANA_FRAME: 
+
+            if self.index < THROW_BANANA_FRAME:
+                img_idx = min(int(self.index) // 10, len(self.ATKimages) - 1)
+                self.image = self.ATKimages[img_idx]
+                self.index += time_step
+            elif not self._banana_thrown:
+                self._banana_thrown = True
                 self.throw_sound.play()
                 banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2)), bananaHit_group ) )
                 banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 + 20)), bananaHit_group ) )
                 banana_group.add( Banana( (self.rect.center[0], (self.rect.top + self.height // 2 - 20)), bananaHit_group ) )
                 self.image = self.ATKimages[8]
-                self.index += 1
+                self.index += time_step
             elif self.index < FINAL_FRAME:
                 self.image = self.ATKimages[9]
-                self.index += 1
+                self.index += time_step
             else:
                 self.image = self.raw_image
                 self.isATK = False
-                self.index = 0
+                self.index = 0.0
         elif self.energy >= self.energy_limit:
             self.attack()
-            self.energy = 0
+            self.energy = 0.0
         else:
-            self.energy += 1
+            self.energy += time_step
     
     def attack(self):
         self.isATK = True
+        self._atk_sound_played = False
+        self._banana_thrown = False
 
-    def walking(self):
-        if self.rect.left > WINDOW_WIDTH * (700.0 / 1280.0):
-            self.rect.left -= 1
-            self.index += 1
+    def walking(self, time_step):
+        if self.rect.left > VIRTUAL_WIDTH * (700.0 / 1280.0):
+            self.x -= time_step
+            self.rect.left = int(self.x)
+            self.index += time_step
 
-            if self.index == 107:
-                self.index = 0
-            else:
-                self.image = self.walkingImages[self.index // 18]
+            if self.index >= 107:
+                self.index = self.index % 107
+            img_idx = min(int(self.index) // 18, len(self.walkingImages) - 1)
+            self.image = self.walkingImages[img_idx]
         else:
-            self.index = 0
+            self.index = 0.0
             self.keepWalking = False
             self.image = self.raw_image
+

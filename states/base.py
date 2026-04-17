@@ -11,7 +11,7 @@ class StateBase:
     def handle_events(self, events):
         pass
 
-    def update(self):
+    def update(self, delta_time):
         pass
 
     def draw(self, surface):

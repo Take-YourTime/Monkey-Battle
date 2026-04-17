@@ -31,9 +31,9 @@ class StateMachine:
         if self.current_state:
             self.current_state.handle_events(events)
 
-    def update(self):
+    def update(self, delta_time):
         if self.current_state:
-            self.current_state.update()
+            self.current_state.update(delta_time)
 
     def draw(self, surface):
         if self.current_state:

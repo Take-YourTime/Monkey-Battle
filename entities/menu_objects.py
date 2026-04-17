@@ -3,7 +3,7 @@ import pygame
 import function
 import random
 import math
-from function import WHITE, get_normalize_vector, get_random_position, WINDOW_WIDTH, WINDOW_HEIGHT
+from function import WHITE, get_normalize_vector, get_random_position, WINDOW_WIDTH, WINDOW_HEIGHT, REFERENCE_FPS
 from core.resource_manager import ResourceManager, resource_path
 
 '''
@@ -28,7 +28,7 @@ class Menu(pygame.sprite.Sprite):
         self.opacity = 10
         self.isExponentiation = True
     
-    def update(self):
+    def update(self, delta_time):
         if self.isExponentiation == True:
             if self.opacity <= 255:
                 self.opacity += 2
@@ -54,20 +54,26 @@ class Button(pygame.sprite.Sprite):
         self.height = height
         self.text = buttonText
         self.font = pygame.font.Font(resource_path("menu\\Wordefta.otf"), textSize)
-        self.text_surface = self.font.render(buttonText, True, WHITE)
         self.rect = pygame.Rect(self.x, self.y, width, height)
         self.isCollideMouse = False
 
         # hover animation 0.0 ~ 1.0
         self.hover_progress = 0.0
 
-    def update(self, mouse_pos) -> None:
+        # Pre-render text surfaces for normal and hover states (cached)
+        self._text_normal = self.font.render(buttonText, True, WHITE)
+        self._text_hover = self.font.render(buttonText, True, (230, 255, 230))
+        self.text_surface = self._text_normal
+        self._text_center = (self.x + self.width // 2, self.y + self.height // 2 + self.height // 10)
+
+    def update(self, delta_time, mouse_pos) -> None:
+        time_step = delta_time * REFERENCE_FPS
         if self.rect.collidepoint( mouse_pos ):
             self.isCollideMouse = True
-            self.hover_progress = min(1.0, self.hover_progress + 0.1)
+            self.hover_progress = min(1.0, self.hover_progress + 0.1 * time_step)
         else:
             self.isCollideMouse = False
-            self.hover_progress = max(0.0, self.hover_progress - 0.1)
+            self.hover_progress = max(0.0, self.hover_progress - 0.1 * time_step)
 
     def draw(self, surface):
         alpha = int(20 + 80 * self.hover_progress)
@@ -79,15 +85,10 @@ class Button(pygame.sprite.Sprite):
 
         surface.blit(bg_surface, (self.x, self.y))
         
-        # 變色或純白
-        color = (255, 255, 255)
-        if self.hover_progress > 0.5:
-            color = (230, 255, 230)
-        
-        self.text_surface = self.font.render(self.text, True, color)
+        # Use pre-rendered cached text surface based on hover state
+        self.text_surface = self._text_hover if self.hover_progress > 0.5 else self._text_normal
         # 中心對齊
-        # center = (self.x + self.width // 2, self.y + self.height // 2 + 5)
-        text_rect = self.text_surface.get_rect(center = (self.x + self.width // 2, self.y + self.height // 2 + self.height // 10))
+        text_rect = self.text_surface.get_rect(center = self._text_center)
         surface.blit(self.text_surface, text_rect)
 
 class VolumeSlider(pygame.sprite.Sprite):
@@ -99,6 +100,11 @@ class VolumeSlider(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, width, height)
         self.volume = 1.0
         self.is_dragging = False
+
+        # Cache font and text surface to avoid re-creating every frame
+        self._font = pygame.font.Font(resource_path("menu\\Wordefta.otf"), 24)
+        self._last_vol_pct = -1
+        self._vol_text_surface = None
 
     def handle_event(self, event, mouse_pos):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -118,10 +124,12 @@ class VolumeSlider(pygame.sprite.Sprite):
         return True
 
     def draw(self, surface):
-        # 繪製底部文字
-        font = pygame.font.Font(resource_path("menu\\Wordefta.otf"), 24)
-        vol_text = font.render(f"MUSIC VOL: {int(self.volume * 100)}%", True, WHITE)
-        surface.blit(vol_text, (self.x, self.y - 30))
+        # 繪製底部文字（僅在音量變化時重新渲染）
+        vol_pct = int(self.volume * 100)
+        if vol_pct != self._last_vol_pct:
+            self._vol_text_surface = self._font.render(f"MUSIC VOL: {vol_pct}%", True, WHITE)
+            self._last_vol_pct = vol_pct
+        surface.blit(self._vol_text_surface, (self.x, self.y - 30))
 
         # 繪製灰色軌道
         track_rect = pygame.Rect(self.x, self.y + self.height // 2 - 2, self.width, 4)
@@ -147,9 +155,12 @@ class Title(pygame.sprite.Sprite):
         self.text = titleText
         self.font = pygame.font.Font(resource_path("menu\\Tightones.otf"), textSize)
         self.text_surface = self.font.render(self.text, True, (WHITE))
+        self._last_color = None  # Cache: only re-render text when color changes
     
     def draw(self, color, surface):
-        self.text_surface = self.font.render(self.text, True, (255, color, color))
+        if color != self._last_color:
+            self.text_surface = self.font.render(self.text, True, (255, color, color))
+            self._last_color = color
         surface.blit(self.text_surface, (self.x, self.y))
 
 
@@ -168,10 +179,10 @@ class Star(pygame.sprite.Sprite):
                        rm.get_image("menu\\star6.png"),
                        rm.get_image("menu\\star7.png")]
 
-        self.image = self.raw_image
+        self.image = self.raw_image.copy()  # Copy so set_alpha won't affect RM cache
         # images index
-        self.index = 0
-        self.opacity = 20
+        self.index = 0.0
+        self.opacity = 20.0
         self.angle = random.randint(0, 90)
         self.isOpacityAscending = True
         self.width = self.image.get_width()
@@ -183,22 +194,108 @@ class Star(pygame.sprite.Sprite):
         self.x = float(location[0])
         self.y = float(location[1])
 
-    def update(self) -> None:
+    def update(self, delta_time) -> None:
+        time_step = delta_time * REFERENCE_FPS
         # out of map
         if (self.x > WINDOW_WIDTH + self.width or self.x < -(self.width) or self.y > WINDOW_HEIGHT + self.height or self.y < -(self.height) ):
             self.kill()
         else:
             if self.isOpacityAscending == True:
-                self.opacity += 2
+                self.opacity += 2 * time_step
                 if self.opacity >= 253:
                     self.isOpacityAscending = False
             else:
-                self.opacity -= 2
+                self.opacity -= 2 * time_step
                 if self.opacity <= 20:
                     self.isOpacityAscending = True
             
-            self.index += 1
-            #self.image = Star.images[(self.index // 40) % 8]
-            self.x += self.vector[0]
-            self.y += self.vector[1]
-            self.rect.topleft = (self.x, self.y)
+            self.image.set_alpha(int(max(0, min(255, self.opacity))))  # Apply alpha directly on owned copy
+            self.index += time_step
+            self.x += self.vector[0] * time_step
+            self.y += self.vector[1] * time_step
+            self.rect.topleft = (int(self.x), int(self.y))
+
+
+class OptionSelector:
+    """
+    可複用的水平選項選擇器（radio group 風格）。
+    用於設定頁面中具有離散選項的設定項目。
+    
+    Usage:
+        selector = OptionSelector((x, y), ["30", "60", "90"], default_index=1)
+        selector.handle_event(event, mouse_pos)  # 處理點擊
+        selector.update(delta_time, mouse_pos)            # 更新 hover 動畫
+        selector.draw(surface)                    # 繪製
+        current_value = selector.get_value()      # 取得目前選中的值
+    """
+    def __init__(self, location, options, default_index=0, btn_width=80, btn_height=50, text_size=36, gap=15):
+        self.x, self.y = location
+        self.options = options
+        self.selected_index = default_index
+        self.btn_width = btn_width
+        self.btn_height = btn_height
+        self.gap = gap
+        self.font = pygame.font.Font(resource_path("menu\\Wordefta.otf"), text_size)
+        
+        # Build rects and pre-render text for each option
+        self._rects = []
+        self._text_surfaces = []
+        self._text_selected_surfaces = []
+        self._hover_progress = []
+        for i, opt in enumerate(options):
+            rx = self.x + i * (btn_width + gap)
+            rect = pygame.Rect(rx, self.y, btn_width, btn_height)
+            self._rects.append(rect)
+            self._text_surfaces.append(self.font.render(str(opt), True, WHITE))
+            self._text_selected_surfaces.append(self.font.render(str(opt), True, (30, 30, 30)))
+            self._hover_progress.append(0.0)
+    
+    def handle_event(self, event, mouse_pos):
+        """處理滑鼠點擊事件，回傳是否有變更選項"""
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            for i, rect in enumerate(self._rects):
+                if rect.collidepoint(mouse_pos):
+                    if i != self.selected_index:
+                        self.selected_index = i
+                        return True
+        return False
+    
+    def update(self, delta_time, mouse_pos):
+        time_step = delta_time * REFERENCE_FPS
+        for i, rect in enumerate(self._rects):
+            if rect.collidepoint(mouse_pos):
+                self._hover_progress[i] = min(1.0, self._hover_progress[i] + 0.1 * time_step)
+            else:
+                self._hover_progress[i] = max(0.0, self._hover_progress[i] - 0.1 * time_step)
+    
+    def draw(self, surface):
+        for i, rect in enumerate(self._rects):
+            is_selected = (i == self.selected_index)
+            hover = self._hover_progress[i]
+            
+            bg = pygame.Surface((self.btn_width, self.btn_height), pygame.SRCALPHA)
+            
+            if is_selected:
+                # 選中：白色填滿背景 + 深色文字
+                pygame.draw.rect(bg, (255, 255, 255, 220), bg.get_rect(), border_radius=12)
+                pygame.draw.rect(bg, (255, 255, 255, 255), bg.get_rect(), width=2, border_radius=12)
+            else:
+                # 未選中：半透明 + hover 效果
+                alpha = int(20 + 60 * hover)
+                pygame.draw.rect(bg, (255, 255, 255, alpha), bg.get_rect(), border_radius=12)
+                pygame.draw.rect(bg, (255, 255, 255, 150), bg.get_rect(), width=2, border_radius=12)
+            
+            surface.blit(bg, rect.topleft)
+            
+            # 文字置中
+            text = self._text_selected_surfaces[i] if is_selected else self._text_surfaces[i]
+            text_rect = text.get_rect(center=rect.center)
+            surface.blit(text, text_rect)
+    
+    def get_value(self):
+        """回傳目前選中的選項值（字串）"""
+        return self.options[self.selected_index]
+    
+    def get_index(self):
+        """回傳目前選中的索引"""
+        return self.selected_index

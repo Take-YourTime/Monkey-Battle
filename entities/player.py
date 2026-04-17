@@ -1,5 +1,5 @@
 import pygame
-from function import numberFollowTarget, WHITE
+from function import numberFollowTarget, WHITE, REFERENCE_FPS
 from core.resource_manager import ResourceManager
 from entities.base import Entity
 
@@ -17,7 +17,7 @@ class Player(Entity):
             [rm.get_image("player//swingO1_0.png"), rm.get_image("player//swingO3_1.png"), rm.get_image("player//swingO3_2.png")] 
         ]
         self.ATKseries_index = 0
-        self.ATKseries_photo_index = 0
+        self.ATKseries_photo_index = 0.0
         self.isATK = False
         self.rect = self.raw_image.get_rect()
         self.rect.topleft = (location_x, location_y)
@@ -25,7 +25,7 @@ class Player(Entity):
         self.width = self.raw_image.get_width()
         self.height = self.raw_image.get_height()
         self.life = settings["life"]
-        self.power = settings["max_power"]
+        self.power = float(settings["max_power"])
 
         self.shoot_sound = rm.get_sound("player/attack/shoot.wav", 0.5) # main character basic attack sound
 
@@ -33,25 +33,27 @@ class Player(Entity):
         self.life_font = pygame.font.SysFont(None, 40)
         self.life_text_surface = self.life_font.render(f"Life: {self.life}", True, WHITE)
     
-    def update(self):
+    def update(self, delta_time):
+        time_step = delta_time * REFERENCE_FPS
         if self.power < 100:
-            self.power += 1
+            self.power = min(self.power + time_step, 100)
         
         if self.isATK:
-            self.image = self.ATKimages[self.ATKseries_index][self.ATKseries_photo_index // 11]
+            img_idx = min(int(self.ATKseries_photo_index) // 11, 2)
+            self.image = self.ATKimages[self.ATKseries_index][img_idx]
 
             ATKSERIES_FINAL_INDEX = 2
             ATKSERIES_PHOTO_FINAL_INDEX = 32
 
-            if self.ATKseries_photo_index == ATKSERIES_PHOTO_FINAL_INDEX:
-                self.ATKseries_photo_index = 0
+            if self.ATKseries_photo_index >= ATKSERIES_PHOTO_FINAL_INDEX:
+                self.ATKseries_photo_index = 0.0
                 self.isATK = False
                 if self.ATKseries_index == ATKSERIES_FINAL_INDEX:
                     self.ATKseries_index = 0
                 else:
                     self.ATKseries_index += 1
             else:
-                self.ATKseries_photo_index += 1
+                self.ATKseries_photo_index += time_step
         else:
             self.image = self.raw_image
         
@@ -77,17 +79,23 @@ class AP(pygame.sprite.Sprite):
         self.image = self.raw_image
         self.rect = self.image.get_rect()
         self.rect.topleft = location
-        self.width = self.image.get_width()
+        self.width = float(self.image.get_width())
         self.height = self.image.get_height()
         self.isAPchange = False
     
-    def update(self, player_AP) -> None:
+    def update(self, delta_time, player_AP) -> None:
+        time_step = delta_time * REFERENCE_FPS
         if self.isAPchange and player_AP > 0:
-            newWidth = numberFollowTarget(self.width, player_AP, 0.5)
-            if self.width - newWidth <= 1:
+            # Framerate-independent lerp: adjust rate based on delta_time
+            rate = 1.0 - pow(0.5, time_step)
+            newWidth = numberFollowTarget(self.width, player_AP, rate)
+            if abs(self.width - newWidth) <= 1:
                 self.isAPchange = False
             else:
-                self.image = pygame.transform.scale(self.raw_image, (newWidth, self.height))
+                APwidth = max(1, min(int(newWidth), 100))
+                self.image = self.raw_image.subsurface((0, 0, APwidth, self.height))
                 self.width = newWidth
         if 0 < player_AP < 100:
-            self.image = pygame.transform.scale(self.raw_image, (player_AP, self.height))
+            APwidth = max(1, min(int(player_AP), 100))
+            self.image = self.raw_image.subsurface((0, 0, APwidth, self.height))
+
