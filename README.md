@@ -3,8 +3,8 @@
 This game is inspired by the concept of a fan-made game, which is called **Maple Cut**, it is an action game set in **MapleStory**.  
 Fight endless waves of monkeys, dodge attacks, and defeat the powerful Monkey King boss!  
 
-> Original made in **July, 2024**.
-> Edit with Antigravity in **March, 2026**.
+> Original made in **July, 2024**.  
+> Edit with Antigravity in **March, 2026**.  
 
 ---
 
