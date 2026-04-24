@@ -20,32 +20,6 @@ Fight endless waves of monkeys, dodge attacks, and defeat the powerful Monkey Ki
 
 ---
 
-## 📁 File Structure
-```
-Monkey Battle/
-├── MonkeyBattle.py      # 🎮 Main entry point — run this to start the game
-├── Player.py            # Player class (movement, shooting, abilities)
-├── Monkey.py            # Monkey enemy class
-├── MonkeyKing.py        # Boss enemy class
-├── Magician.py          # Magician enemy class
-├── Menu.py              # Menu UI (buttons, title, stars)
-├── function.py          # Shared constants and window setup
-├── angelMonkey/         # Angel monkey sprite frames
-├── banana/              # Banana projectile sprite frames
-├── menu/                # Menu assets (fonts, music, images)
-├── monkey/              # Monkey enemy sprite frames
-├── monkeyKing/          # Boss monkey sprite frames
-├── player/              # Player character sprite frames
-├── school.png           # Background image
-├── sunset.jpg           # Alternative background
-├── Motivation.mp3       # Background music
-├── wind_path.mp3        # Wind sound effect
-├── hit.wav              # Hit sound effect
-└── shoot.wav            # Shoot sound effect
-```
-
----
-
 ## 🚀 How to Run
 1. Open this folder in **VS Code**.
 2. Make sure **Pygame** is installed:
@@ -70,3 +44,105 @@ Monkey Battle/
 - Default window size: **1366 × 768**.
 - This is a fan-made game — all characters and concepts are inspired by *MapleStory*.
 
+---
+
+## 📁 File Structure
+```
+\---Monkey Battle
+    |   .gitattributes
+    |   .gitignore
+    |   function.py
+    |   LICENSE
+    |   main_icon.ico
+    |   MonkeyBattle.py
+    |   README.md
+    |   school.png
+    |
+    +---.agents
+    |   +---rules
+    |   +---skills
+    |   |       SKILL.md
+    |   |
+    |   \---workflows
+    +---angelMonkey
+    |       ...
+    |
+    +---BGM
+    |       JustAnotherMapleLeaf.mp3
+    |       Motivation.mp3
+    |
+    +---bigWhiteMonkey
+    |   |   bigWhiteMoneky.png
+    |   |
+    |   +---die\...
+    |   |
+    |   +---jumpAttack\...
+    |   |   |
+    |   |   \---dust\...
+    |   |
+    |   +---move\...
+    |   |
+    |   +---shootAttack\...
+    |       \---seed\...
+    |
+    +---config
+    |       settings.json
+    |       waves.json
+    |
+    +---core
+    |       engine.py
+    |       resource_manager.py
+    |       state_machine.py
+    |
+    +---effects
+    |       animations.py
+    |
+    +---entities
+    |       angel_monkey.py
+    |       base.py
+    |       big_white_monkey.py
+    |       magician.py
+    |       menu_objects.py
+    |       monkey.py
+    |       monkey_king.py
+    |       player.py
+    |       projectiles.py
+    |
+    +---magician
+    |       ...
+    |
+    +---menu
+    |       ...
+    |
+    +---monkey
+    |   |   ... 
+    |   |
+    |   \---banana
+    |           ...
+    |
+    +---monkeyKing
+    |   |   ...
+    |   |
+    |   \---banana
+    |          ...
+    |
+    +---player
+    |   |   ...
+    |   |
+    |   \---attack
+    |           ...
+    |
+    +---states
+    |       base.py
+    |       end_page.py
+    |       game_page.py
+    |       loading_page.py
+    |       menu_page.py
+    |       setting_page.py
+    |   
+    |
+    +---_unuse_material_\   # some resource that is not used
+    |
+    \---__pycache__
+            function.cpython-312.pyc
+```
