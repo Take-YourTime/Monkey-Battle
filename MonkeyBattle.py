@@ -11,7 +11,7 @@ from states.end_page import EndState
 def main():
     # Waiting for the system getting ready.
     pygame.time.delay(500)
-
+    
     # 實例化遊戲引擎
     engine = GameEngine()
 
@@ -21,7 +21,7 @@ def main():
     engine.state_machine.add_state("SETTING", SettingState(engine))
     engine.state_machine.add_state("GAME", GameState(engine))
     engine.state_machine.add_state("END", EndState(engine))
-    
+
 
     # 設定初始狀態
     engine.state_machine.change_state("LOADING")

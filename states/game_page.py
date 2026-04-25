@@ -54,6 +54,22 @@ class GameState(StateBase):
         self.wave = ResourceManager.get_instance().load_config("config/waves.json")["waves"]
         self.index = 0
         
+        # stats
+        self.elapsed_time = 0.0
+        self.kill_count = 0
+        self._prev_enemy_count = 0
+
+        # death overlay
+        self._death_overlay_alpha = 0.0   # 0~180，半透明黑幕
+        self._death_overlay_active = False # 是否正在淡入黑幕
+        self._death_waiting_click = False  # 黑幕完成，等待點擊
+        self._overlay_surface = pygame.Surface(
+            (self.engine.virtual_width, self.engine.virtual_height), pygame.SRCALPHA
+        )
+        self._hint_font = pygame.font.Font(
+            resource_path("menu/Wordefta.otf"), 36
+        )
+
         # game start setting
         self.spawn_wave()
         
@@ -144,6 +160,11 @@ class GameState(StateBase):
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
+                # 死亡黑幕完成後，點擊才切換
+                if self._death_waiting_click:
+                    pygame.mixer.music.fadeout(500)
+                    self.engine.state_machine.change_state("END")
+                    return
                 if(self.player.power >= 30):
                     self.playerAP.isAPchange = True
                     self.pencil_group.add( Pencil(45, 5, (self.player.rect.centerx + 3, self.player.rect.centery - 10), self.engine.get_mouse_pos()) )
@@ -151,15 +172,58 @@ class GameState(StateBase):
 
 
 
+    def _total_enemies(self):
+        return (len(self.magician_group) + len(self.monkey_group) +
+                len(self.monkeyKing_group) + len(self.angelMonkey_group) +
+                len(self.bigWhiteMonkey_group))
+
+    def _go_to_end(self, is_win):
+        """收集結算資料並切換至 END 頁面"""
+        self.engine.end_result = {
+            "is_win":    is_win,
+            "kill_count": self.kill_count,
+            "elapsed_time": self.elapsed_time,
+        }
+        if is_win:
+            # 勝利：直接切換
+            pygame.mixer.music.fadeout(500)
+            self.engine.state_machine.change_state("END")
+        else:
+            # 失敗：啟動黑幕淡入，等待玩家點擊
+            self._death_overlay_active = True
+
     def update(self, delta_time):
-        if len(self.magician_group) == 0 and len(self.monkey_group) == 0 and len(self.monkeyKing_group) == 0 and len(self.angelMonkey_group) == 0 and len(self.bigWhiteMonkey_group) == 0:
+        # ── 黑幕淡入中：只更新黑幕，其他邏輯暫停 ──
+        if self._death_overlay_active or self._death_waiting_click:
+            if self._death_overlay_active:
+                self._death_overlay_alpha = min(180.0, self._death_overlay_alpha + 180 * delta_time * 1.5)
+                if self._death_overlay_alpha >= 180.0:
+                    self._death_overlay_active = False
+                    self._death_waiting_click = True
+            return
+
+        self.elapsed_time += delta_time
+
+        # ── 擊殺計數：用前後敵群總數差推算 ──
+        current_count = self._total_enemies()
+        killed_this_frame = max(0, self._prev_enemy_count - current_count)
+        self.kill_count += killed_this_frame
+
+        # ── 玩家死亡 → 失敗（啟動黑幕）──
+        if self.player.life <= 0:
+            self._go_to_end(is_win=False)
+            return
+
+        # ── 全波次清空 → 勝利 ──
+        if self._total_enemies() == 0:
             self.index += 1
             if self.index == len(self.wave):
-                pygame.mixer.music.fadeout(500)
-                self.engine.state_machine.change_state("END")
+                self._go_to_end(is_win=True)
                 return
             else:
                 self.spawn_wave()
+
+        self._prev_enemy_count = self._total_enemies()
 
         # Update
         self.pencil_group.update(delta_time, [self.magician_group, self.monkeyKing_group, self.monkey_group, self.angelMonkey_group, self.bigWhiteMonkey_group],
@@ -215,3 +279,15 @@ class GameState(StateBase):
         # Draw Life point
         surface.blit(self.playerAP.image, (self.playerAP.rect.topleft))
         surface.blit(self.player.life_text_surface, (50, 50))
+
+        # ── 死亡黑幕疊加 ──
+        if self._death_overlay_active or self._death_waiting_click:
+            vw = self.engine.virtual_width
+            vh = self.engine.virtual_height
+            self._overlay_surface.fill((0, 0, 0, int(self._death_overlay_alpha)))
+            surface.blit(self._overlay_surface, (0, 0))
+
+            if self._death_waiting_click:
+                hint_surf = self._hint_font.render("Click to continue...", True, (220, 220, 220))
+                hint_rect = hint_surf.get_rect(center=(vw // 2, vh // 2))
+                surface.blit(hint_surf, hint_rect)
