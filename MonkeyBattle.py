@@ -19,7 +19,7 @@ def main():
     engine.state_machine.add_state("LOADING", LoadingState(engine))
     engine.state_machine.add_state("MENU", MenuState(engine))
     engine.state_machine.add_state("SETTING", SettingState(engine))
-    engine.state_machine.add_state("GAME", GameState(engine))
+    engine.state_machine.add_state("GAME", GameState(engine)) 
     engine.state_machine.add_state("END", EndState(engine))
 
 

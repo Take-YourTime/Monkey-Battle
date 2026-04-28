@@ -156,3 +156,93 @@ class DustEffect(AnimatedEffect):
             self.kill()
             return False
 
+
+class BookHit(pygame.sprite.Sprite):
+    """書本命中特效：使用 bookHit.png 圖片，快速淡出。"""
+
+    def __init__(self, location):
+        super().__init__()
+        rm  = ResourceManager.get_instance()
+        raw = rm.get_image("player/attack/bookHit.png")
+        self.raw_image = pygame.transform.smoothscale(raw, (80, 80))
+        self.image     = self.raw_image.copy()
+        self.rect      = self.image.get_rect(center=location)
+        self.opacity   = 255.0
+
+    def update(self, delta_time):
+        time_step      = delta_time * REFERENCE_FPS
+        self.opacity  -= 8 * time_step
+        if self.opacity <= 0:
+            self.kill()
+        else:
+            self.image = self.raw_image.copy()
+            self.image.set_alpha(int(self.opacity))
+
+
+class HealText(pygame.sprite.Sprite):
+    """
+    浮動治療數字特效：顯示綠色 +X HP 並向上浮動淡出。
+    在技能四（休息時刻）結束後觸發。
+    """
+
+    def __init__(self, location, amount: int):
+        super().__init__()
+        font       = pygame.font.SysFont(None, 42)
+        text_surf  = font.render(f"+{amount} HP", True, (60, 230, 100))
+        # 加一層深色描邊增加可讀性
+        outline    = font.render(f"+{amount} HP", True, (20, 80, 30))
+        w, h       = text_surf.get_size()
+        self.image = pygame.Surface((w + 2, h + 2), pygame.SRCALPHA)
+        self.image.blit(outline, (1, 1))
+        self.image.blit(text_surf, (0, 0))
+        self.rect    = self.image.get_rect(center=location)
+        self.y       = float(self.rect.y)
+        self.opacity = 255.0
+
+    def update(self, delta_time):
+        time_step     = delta_time * REFERENCE_FPS
+        self.y       -= 0.8 * time_step      # 每幀向上浮動
+        self.rect.y   = int(self.y)
+        self.opacity -= 3.5 * time_step      # 約 1.5 秒淡出
+        if self.opacity <= 0:
+            self.kill()
+        else:
+            self.image.set_alpha(int(self.opacity))
+
+
+class MotorcycleExplosion(AnimatedEffect):
+    """
+    機車命中爆炸特效：使用 AI 生成的爆炸 sprite（或程式碼繪製備用）。
+    """
+    _cached_frames = None   # 類別快取，避免重複縮放
+
+    def __init__(self, location):
+        super().__init__()
+        rm = ResourceManager.get_instance()
+
+        if MotorcycleExplosion._cached_frames is None:
+            raw = rm.get_image("effects/explosion.png")
+            # 縮放成 4 幀漸大的爆炸效果
+            sizes = [150, 175, 230, 165]
+            MotorcycleExplosion._cached_frames = [
+                pygame.transform.scale(raw, (s, s)) for s in sizes
+            ]
+
+        self.images = MotorcycleExplosion._cached_frames
+        self.image  = self.images[0]
+        self.rect   = self.image.get_rect(center=location)
+        self._center = location
+        self.opacity = 255.0
+
+    def update(self, delta_time):
+        time_step   = delta_time * REFERENCE_FPS
+        FINAL_FRAME = 32
+        if self.index < FINAL_FRAME:
+            img_idx     = min(int(self.index) // 8, len(self.images) - 1)
+            self.image  = self.images[img_idx].copy()
+            alpha       = int(255 * (1.0 - self.index / FINAL_FRAME))
+            self.image.set_alpha(alpha)
+            self.rect   = self.image.get_rect(center=self._center)
+            self.index += time_step
+        else:
+            self.kill()

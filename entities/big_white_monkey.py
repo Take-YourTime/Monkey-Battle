@@ -37,6 +37,7 @@ class BigWhiteMonkey(Entity):
         self.has_done_50_jump = False
         self.has_done_25_jump = False
         self._jump_hit_done = False  # flag for jump impact
+        self.stun_timer = 0.0        # 重擊剩餘時間（秒）
 
         self.width = self.raw_image.get_width()
         self.height = self.raw_image.get_height()
@@ -47,6 +48,7 @@ class BigWhiteMonkey(Entity):
     def hurt(self, damage=1):
         if self.state == "die":
             return
+        self.stun_timer = 0.0    # 受傷清除重擊
         self.life -= damage
         if self.life <= 0:
             self.life = 0
@@ -67,8 +69,27 @@ class BigWhiteMonkey(Entity):
         pass # Removed as per user instruction to not calculate vectors dynamically
 
 
+    def stun(self, duration: float):
+        """施加重擊，強制取消攻擊動畫並停止行動。"""
+        if self.state == "die":
+            return
+        self.stun_timer = duration
+        # 中斷射擊/跳躍攻擊，回到等待狀態
+        if self.state in ("shootAttack", "jumpAttack"):
+            self.state = "wait"
+            self.index = 0.0
+            self.seeds_fired = 0
+        self.image = self.raw_image
+
     def update(self, delta_time, player, seed_group, seedHit_group, dust_group):
-        time_step = delta_time * REFERENCE_FPS # time_step is the time step   
+        time_step = delta_time * REFERENCE_FPS # time_step is the time step
+
+        # ── 重擊狀態：停止所有行動 ──
+        if self.stun_timer > 0:
+            self.stun_timer -= delta_time
+            self.image = self.raw_image
+            return
+
         if self.state == "die":
             self.die(time_step)
         elif self.state == "jumpAttack":

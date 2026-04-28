@@ -25,9 +25,20 @@ class Magician(Entity):
         self.skill_energy = 0.0
         self.skill_consume = random.randint(settings["skill_consume_min"], settings["skill_consume_max"])
         self.move_times = float(random.randint(settings["move_times_min"], settings["move_times_max"]))
+        self.stun_timer = 0.0   # 重擊剩餘時間（秒）
     
+    def stun(self, duration: float):
+        """施加重擊，臨時停止移動與攻擊。"""
+        self.stun_timer = duration
+
     def update(self, delta, stone_group):
         time_step = delta * REFERENCE_FPS
+
+        # ── 重擊狀態：停止所有行動 ──
+        if self.stun_timer > 0:
+            self.stun_timer -= delta
+            return
+
         # Movement logic
         if self.move_times > 0:
             self.x -= time_step

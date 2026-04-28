@@ -1,14 +1,54 @@
 {
   "player": {
-    "life": 50,
-    "max_power": 100,
-    "power_regen": 1,
-    "attack_cost": 30,
+    "base_life": 50,
+    "base_ap": 100,
+    "base_mp": 50,
+    "ap_per_level": 5,
+    "mp_per_level": 5,
+    "ap_regen_base": 0.1,
+    "mp_regen_base": 0.05,
+    "max_level": 50,
+    "exp_per_kill": 1,
+    "exp_to_level_up": 2,
     "damage_taken": {
       "banana": 5,
       "monkey": 1,
       "stone": 1,
       "seed": 1
+    },
+    "skills": {
+      "pencil": {
+        "ap_cost": 20,
+        "damage": 1,
+        "unlock_level": 1
+      },
+      "book": {
+        "mp_cost": 20,
+        "damage": 5,
+        "unlock_level": 1,
+        "stun_duration": 0.5
+      },
+      "desk": {
+        "mp_cost": 40,
+        "damage": 10,
+        "unlock_level": 1,
+        "cooldown": 20,
+        "hp": 15,
+        "hp_decay_per_sec": 1
+      },
+      "rest": {
+        "unlock_level": 1,
+        "cooldown": 1,
+        "heal_base": 10,
+        "duration": 3.0
+      },
+      "motorcycle": {
+        "ap_cost_ratio": 0.75,
+        "mp_cost_ratio": 0.75,
+        "damage": 50,
+        "unlock_level": 1,
+        "cooldown": 1
+      }
     }
   },
   "monkey": {

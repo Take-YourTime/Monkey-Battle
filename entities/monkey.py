@@ -35,6 +35,7 @@ class Monkey(Entity):
         self.die_index = 0.0 # die image frame index
         self.energy = float(settings["energy_limit"]) # need energy to attack or use skills
         self._banana_thrown = False  # flag for banana throw trigger
+        self.stun_timer = 0.0        # 重擊剩餘時間（秒）
         
         self.rect = self.image.get_rect()
         self.rect.topleft = (location_x, location_y)
@@ -43,8 +44,25 @@ class Monkey(Entity):
         self.height = self.raw_image.get_height()
         self.life = settings["life"]
         
+    def stun(self, duration: float):
+        """施加重擊，強制取消攻擊動畫並停止行動。"""
+        if self.isDying:
+            return
+        self.stun_timer = duration
+        self.isATK = False
+        self.index = 0.0
+        self._banana_thrown = False
+        self.image = self.raw_image
+
     def update(self, delta_time, player, monkey_BananaHit_group):
         time_step = delta_time * REFERENCE_FPS
+
+        # ── 重擊狀態：停止所有行動 ──
+        if self.stun_timer > 0:
+            self.stun_timer -= delta_time
+            self.image = self.raw_image
+            return
+
         if self.isDying:
             final = len(self.dieImages) * 15
             if self.die_index < final:
@@ -100,6 +118,7 @@ class Monkey(Entity):
         else:
             self.life = 0
             self.isDying = True
+            self.stun_timer = 0.0
             # Clear mask to prevent further projectile collisions while dying
             self.mask = pygame.Mask(self.mask.get_size())
 

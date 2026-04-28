@@ -13,6 +13,8 @@ plan
 /effects/__pycache__
 /states/__pycache__
 
+/player/_unuse_
+
 
 # other
 *.txt
