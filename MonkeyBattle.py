@@ -29,5 +29,5 @@ def main():
     # 啟動主迴圈
     engine.run()
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     main()

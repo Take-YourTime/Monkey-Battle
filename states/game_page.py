@@ -6,11 +6,14 @@ from function import BLACK, VIRTUAL_HEIGHT, VIRTUAL_WIDTH
 from entities.player import Player, PlayerHUD
 from entities.projectiles import Pencil, Book, Motorcycle
 from entities.obstacles import DeskObstacle
+
+# monsters
 from entities.magician import Magician
 from entities.monkey_king import MonkeyKing
 from entities.monkey import Monkey
 from entities.angel_monkey import AngelMonkey
 from entities.big_white_monkey import BigWhiteMonkey
+
 from core.resource_manager import ResourceManager, resource_path
 
 LEFT = 1  # left mouse button
