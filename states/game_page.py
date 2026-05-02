@@ -27,7 +27,7 @@ class GameState(StateBase):
         # load BGM
         rm = ResourceManager.get_instance()
         pygame.mixer.music.load(resource_path("BGM/Motivation.mp3"))
-        pygame.mixer.music.set_volume(0.4 * rm.global_volume)
+        pygame.mixer.music.set_volume(0.3 * rm.global_volume)
 
         # load raw background
         self.background = rm.get_image("school.png", alpha=False)
@@ -74,10 +74,10 @@ class GameState(StateBase):
         self.kill_count        = 0
         self._prev_enemy_count = 0
 
-        # ── Death overlay ─────────────────────────────────────────
-        self._death_overlay_alpha  = 0.0
-        self._death_overlay_active = False
-        self._death_waiting_click  = False
+        # death overlay
+        self._death_overlay_alpha   = 0.0   # 0~180，半透明黑幕
+        self._death_overlay_active  = False # 是否正在淡入黑幕
+        self._death_waiting_click   = False # 黑幕完成，等待點擊
         self._overlay_surface = pygame.Surface(
             (self.engine.virtual_width, self.engine.virtual_height), pygame.SRCALPHA
         )
@@ -85,31 +85,39 @@ class GameState(StateBase):
             resource_path("menu/Wordefta.otf"), 36
         )
 
-        # game start
+        # game start setting
         self.spawn_wave()
+        
         pygame.mixer.music.play(-1)
 
-    # ─────────────────────────────────────────────────────────────
     def spawn_wave(self):
-        self.moneyShowUpSound.play()
-        for _ in range(self.wave[self.index][0]):
+
+        self.moneyShowUpSound.play() # play monkey show up sound
+
+        # monkey
+        for _ in range( self.wave[self.index][0] ):
             x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
             self.monkey_group.add(Monkey(x, self.engine.virtual_height - 176))
+        # magician
         for _ in range(self.wave[self.index][1]):
             self.magician_group.add(Magician(100, 100))
+        # monkey king
         for _ in range(self.wave[self.index][2]):
             x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
             self.monkeyKing_group.add(MonkeyKing(x, self.engine.virtual_height - 373))
+        # angel monkey
         for _ in range(self.wave[self.index][3]):
             x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
             self.angelMonkey_group.add(AngelMonkey(x, self.engine.virtual_height - 185))
+        # big white monkey
         for _ in range(self.wave[self.index][4]):
             x = random.randint(self.engine.virtual_width, self.engine.virtual_width + 150)
             self.bigWhiteMonkey_group.add(BigWhiteMonkey(x, self.engine.virtual_height - 191))
 
-    # ─────────────────────────────────────────────────────────────
     def exit(self):
+        # Stop background music or fade out
         pygame.mixer.music.fadeout(500)
+        
         self.player.kill()
 
         groups_to_clear = [
@@ -161,32 +169,23 @@ class GameState(StateBase):
 
                 skill = self.player.active_skill
                 mouse_pos = self.engine.get_mouse_pos()
-                player_center = (
-                    self.player.rect.centerx + 3,
-                    self.player.rect.centery - 10,
-                )
 
                 # ── 技能 1：鉛筆射擊 ──
                 if skill == 1:
                     if self.player.ap >= cfg["skills"]["pencil"]["ap_cost"]:
                         self.player.attack()
-                        self.pencil_group.add(
-                            Pencil(45, 5, player_center, mouse_pos)
-                        )
+                        self.pencil_group.add( Pencil(45, 5, (self.player.rect.centerx + 3, self.player.rect.centery - 10), mouse_pos) )
 
                 # ── 技能 2：丟書 ──
                 elif skill == 2:
                     if self.player.throw_book():
-                        self.book_group.add(Book(player_center, mouse_pos))
+                        self.book_group.add(Book((self.player.rect.centerx + 3, self.player.rect.centery - 10), mouse_pos))
 
                 # ── 技能 3：課桌椅障礙物 ──
                 elif skill == 3:
                     if self.player.use_desk():
-                        desk_x    = self.player.rect.right + 60
-                        ground_y  = self.engine.virtual_height - 273  # 與玩家同高
-                        self.desk_group.add(
-                            DeskObstacle(desk_x, ground_y)
-                        )
+                        self.desk_group.empty() # 確保場上只有一個課桌椅
+                        self.desk_group.add( DeskObstacle((self.player.rect.right + 35, self.player.rect.centery + 95)) )
 
                 # ── 技能 4：休息時刻 ──
                 elif skill == 4:
@@ -210,33 +209,32 @@ class GameState(StateBase):
         )
 
     def _go_to_end(self, is_win):
+        """收集結算資料並啟動結算黑幕淡入"""
+        if self._death_overlay_active or self._death_waiting_click:
+            return
+
         self.engine.end_result = {
             "is_win":      is_win,
             "kill_count":  self.kill_count,
             "elapsed_time": self.elapsed_time,
         }
-        if is_win:
-            pygame.mixer.music.fadeout(500)
-            self.engine.state_machine.change_state("END")
-        else:
-            self._death_overlay_active = True
+        
+        # 啟動黑幕淡入，等待玩家點擊
+        self._death_overlay_active = True
 
-    # ─────────────────────────────────────────────────────────────
     def update(self, delta_time):
-        # ── 黑幕淡入中 ──
+        # ── 黑幕淡入中：只更新黑幕，其他邏輯暫停 ──
         if self._death_overlay_active or self._death_waiting_click:
             if self._death_overlay_active:
-                self._death_overlay_alpha = min(
-                    180.0, self._death_overlay_alpha + 180 * delta_time * 1.5
-                )
+                self._death_overlay_alpha = min(180.0, self._death_overlay_alpha + 180 * delta_time * 1.5)
                 if self._death_overlay_alpha >= 180.0:
                     self._death_overlay_active = False
-                    self._death_waiting_click  = True
+                    self._death_waiting_click = True
             return
 
         self.elapsed_time += delta_time
 
-        # ── 擊殺計數 & 給玩家經驗 ──────────────────────────────
+        # ── 擊殺計數：用前後敵群總數差推算 ──
         current_count = self._total_enemies()
         killed_this_frame = max(0, self._prev_enemy_count - current_count)
         if killed_this_frame > 0:
@@ -245,7 +243,7 @@ class GameState(StateBase):
             cfg = rm.load_config("config/settings.json")["player"]
             self.player.gain_exp(killed_this_frame * cfg["exp_per_kill"])
 
-        # ── 玩家死亡 ──────────────────────────────────────────
+        # ── 玩家死亡 → 失敗（啟動黑幕）──
         if self.player.life <= 0:
             self._go_to_end(is_win=False)
             return
@@ -287,7 +285,7 @@ class GameState(StateBase):
 
         self.bookHit_group.update(delta_time)
 
-        # 課桌椅：落下時對所有敵人造成傷害
+        # 課桌椅：落下時對範圍內所有敵人造成傷害
         cfg_desk = ResourceManager.get_instance().load_config(
             "config/settings.json"
         )["player"]["skills"]["desk"]
@@ -324,30 +322,9 @@ class GameState(StateBase):
 
         self.monkeyKing_group.update(delta_time, self.banana_group, self.bananaHit_group)
 
-        # 近戰猴子：若有障礙物優先攻擊障礙物
-        for monkey in self.monkey_group:
-            if len(self.desk_group) > 0:
-                # 簡化：讓猴子的攻擊落點導向最近的障礙物
-                desk_list = list(self.desk_group)
-                nearest   = min(desk_list, key=lambda d: abs(d.rect.centerx - monkey.rect.centerx))
-                # 若猴子已停下且不在攻擊，讓其攻擊障礙物
-                if not monkey.keepWalking and not monkey.isATK and monkey.energy >= 300:
-                    nearest.hurt(1)
-                    monkey.energy = 0.0
-                monkey.update(delta_time, self.player, self.monkey_BananaHit_group)
-            else:
-                monkey.update(delta_time, self.player, self.monkey_BananaHit_group)
-
-        for angel in self.angelMonkey_group:
-            if len(self.desk_group) > 0:
-                desk_list = list(self.desk_group)
-                nearest   = min(desk_list, key=lambda d: abs(d.rect.centerx - angel.rect.centerx))
-                if not angel.keepWalking and not angel.isATK and angel.energy >= 300:
-                    nearest.hurt(1)
-                    angel.energy = 0.0
-                angel.update(delta_time, self.player, self.monkey_BananaHit_group)
-            else:
-                angel.update(delta_time, self.player, self.monkey_BananaHit_group)
+        # 近戰猴子與天使猴：忽視課桌椅，直接攻擊玩家
+        self.monkey_group.update(delta_time, self.player, self.monkey_BananaHit_group)
+        self.angelMonkey_group.update(delta_time, self.player, self.monkey_BananaHit_group)
 
         self.bigWhiteMonkey_group.update(
             delta_time, self.player,
@@ -421,6 +398,7 @@ class GameState(StateBase):
             vh = self.engine.virtual_height
             self._overlay_surface.fill((0, 0, 0, int(self._death_overlay_alpha)))
             surface.blit(self._overlay_surface, (0, 0))
+
             if self._death_waiting_click:
                 hint_surf = self._hint_font.render("Click to continue...", True, (220, 220, 220))
                 hint_rect = hint_surf.get_rect(center=(vw // 2, vh // 2))

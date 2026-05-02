@@ -13,7 +13,7 @@ class Pencil(Projectile):
         super().__init__()
         rm = ResourceManager.get_instance()
         self.raw_image = rm.get_image("player/attack/pencil.png")
-        self.hit_sound = rm.get_sound("player/attack/hit.wav", 0.5)
+        self.hit_sound = rm.get_sound("player/sound/pencil_hit.wav", 0.5)
         self.image = self.raw_image
         self.angle = 0
         
@@ -126,7 +126,7 @@ class Book(Projectile):
         self._spin_angle = float(self.angle)      # 目前旋轉角度（度）
         self._spin_speed = 8.0                    # 每基準幀旋轉度數
 
-        self._hit_sound = rm.get_sound("player/skill_icon/book_hit.wav", 0.7)
+        self._hit_sound = rm.get_sound("player/sound/book_hit.wav", 0.7)
 
     def update(self, delta_time, enemy_groups, bullet_groups, book_hit_group):
         """
@@ -230,7 +230,7 @@ class Motorcycle(Projectile):
                     explosion_group.add(MotorcycleExplosion(self.rect.center))
                     enemy.hurt(self.damage)
                     rm = ResourceManager.get_instance()
-                    rm.get_sound("player/skill_icon/motorcycle_bomb.wav", 0.8).play()
+                    rm.get_sound("player/sound/motorcycle_bomb.wav", 0.8).play()
                     self.kill()
                     return
 

@@ -24,7 +24,7 @@
       },
       "book": {
         "mp_cost": 20,
-        "damage": 5,
+        "damage": 3,
         "unlock_level": 1,
         "stun_duration": 0.5
       },
@@ -32,7 +32,7 @@
         "mp_cost": 40,
         "damage": 10,
         "unlock_level": 1,
-        "cooldown": 20,
+        "cooldown": 1,
         "hp": 15,
         "hp_decay_per_sec": 1
       },
@@ -78,7 +78,7 @@
     "move_times_max": 500
   },
   "big_white_monkey": {
-    "life": 10,
+    "life": 15,
     "energy_limit": 400,
     "energy_regen": 1,
     "moving_range_min": 250,

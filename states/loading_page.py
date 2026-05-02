@@ -76,8 +76,8 @@ class LoadingState(StateBase):
 
     def handle_events(self, events):
         for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not self.is_loading:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1 and not self.is_loading: # click left mouse button
                     self.engine.state_machine.change_state("MENU")
 
     def draw(self, surface):
@@ -105,5 +105,5 @@ class LoadingState(StateBase):
             # Fill
             pygame.draw.rect(surface, WHITE, (x, y, bar_width * progress, bar_height))
         else:
-            start_text_surface = self.start_font.render("Press space to start the game!", True, (int(self.start_color), int(self.start_color), int(self.start_color)))
+            start_text_surface = self.start_font.render("Click anywhere to start the game!", True, (int(self.start_color), int(self.start_color), int(self.start_color)))
             surface.blit(start_text_surface, (vw / 2 - start_text_surface.get_width() / 2, vh / 2))

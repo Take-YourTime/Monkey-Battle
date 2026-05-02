@@ -65,10 +65,6 @@ class BigWhiteMonkey(Entity):
             self.index = 0.0
             self._jump_hit_done = False
 
-    def calculate_attack_angle(self, player):
-        pass # Removed as per user instruction to not calculate vectors dynamically
-
-
     def stun(self, duration: float):
         """施加重擊，強制取消攻擊動畫並停止行動。"""
         if self.state == "die":

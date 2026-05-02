@@ -30,7 +30,8 @@ class Player(Entity):
         self.height = self.raw_image.get_height()
 
         # ── Sound ────────────────────────────────────────────────
-        self.shoot_sound = rm.get_sound("player/attack/shoot.wav", 0.5)
+        self.shoot_sound = rm.get_sound("player/sound/pencil_shoot.wav", 0.5)
+        self.throw_sound = rm.get_sound("player/sound/book_throw.wav", 1.0)
 
         # ── Level / Stat system ──────────────────────────────────
         self.level     = 1
@@ -93,9 +94,6 @@ class Player(Entity):
             self._update_life_surface()
 
     def hurt(self, damage=1):
-        """受傷；休息期間免疫。"""
-        if self.is_resting:
-            return
         super().hurt(damage)
         self._update_life_surface()
 
@@ -107,7 +105,7 @@ class Player(Entity):
         cost = cfg["ap_cost"]
         if self.ap < cost:
             return False
-        self.ap  -= cost
+        self.ap -= cost
         self.isATK = True
         self.shoot_sound.play()
         return True
@@ -121,9 +119,9 @@ class Player(Entity):
             return False
         if self.isATK:
             return False
-        self.mp   -= cfg["mp_cost"]
+        self.mp -= cfg["mp_cost"]
         self.isATK = True
-        self.shoot_sound.play()
+        self.throw_sound.play()
         return True
 
     # ── Skill: Desk (3) ─────────────────────────────────────────
@@ -149,6 +147,7 @@ class Player(Entity):
         self.is_resting  = True
         self._rest_timer = self._rest_duration
         self.skill_cooldowns[4] = cfg["cooldown"]
+        rm.get_sound("player/sound/sleep.wav", 1.0).play()
         return True
 
     # ── Skill: Motorcycle (5) ───────────────────────────────────
@@ -165,7 +164,7 @@ class Player(Entity):
         self.ap -= ap_cost
         self.mp -= mp_cost
         self.skill_cooldowns[5] = cfg["cooldown"]
-        rm.get_sound("player/skill_icon/motorcycle.wav", 0.7).play()
+        rm.get_sound("player/sound/motorcycle.wav", 0.9).play()
         return True
 
     # ────────────────────────────────────────────────────────────
@@ -197,7 +196,7 @@ class Player(Entity):
                 self.life = min(self.life + heal, self.max_life)
                 self._update_life_surface()
                 self.image = self.raw_image
-                self.pending_heal_amount = heal   # 觸發浮動文字
+                self.pending_heal_amount = heal   # 回寫提示文字
             return
 
         # ── 攻擊動畫 ─────────────────────────────────────────
