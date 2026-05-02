@@ -32,13 +32,13 @@
         "mp_cost": 40,
         "damage": 10,
         "unlock_level": 6,
-        "cooldown": 1,
+        "cooldown": 15,
         "hp": 15,
         "hp_decay_per_sec": 1
       },
       "rest": {
         "unlock_level": 10,
-        "cooldown": 1,
+        "cooldown": 20,
         "heal_base": 10,
         "duration": 3.0
       },
@@ -47,7 +47,7 @@
         "mp_cost_ratio": 0.75,
         "damage": 50,
         "unlock_level": 15,
-        "cooldown": 1
+        "cooldown": 30
       }
     }
   },
