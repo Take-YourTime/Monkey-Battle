@@ -8,6 +8,7 @@ plan
 /__pycache__
 /_unuse_material_
 /build
+/dist
 
 /entities/__pycache__
 /effects/__pycache__
