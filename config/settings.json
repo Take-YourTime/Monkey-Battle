@@ -25,19 +25,19 @@
       "book": {
         "mp_cost": 20,
         "damage": 3,
-        "unlock_level": 1,
+        "unlock_level": 3,
         "stun_duration": 0.5
       },
       "desk": {
         "mp_cost": 40,
         "damage": 10,
-        "unlock_level": 1,
+        "unlock_level": 6,
         "cooldown": 1,
         "hp": 15,
         "hp_decay_per_sec": 1
       },
       "rest": {
-        "unlock_level": 1,
+        "unlock_level": 10,
         "cooldown": 1,
         "heal_base": 10,
         "duration": 3.0
@@ -46,7 +46,7 @@
         "ap_cost_ratio": 0.75,
         "mp_cost_ratio": 0.75,
         "damage": 50,
-        "unlock_level": 1,
+        "unlock_level": 15,
         "cooldown": 1
       }
     }
