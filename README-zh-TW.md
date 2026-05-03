@@ -1,6 +1,6 @@
 # 🐒 Monkey Battle 🐒
 
-[English](README.md) | [繁體中文]
+> [English](README.md) | [繁體中文]
 
 這款遊戲的靈感來自**新楓之谷**同人小遊戲**Maple Cut**，採用滑鼠進行攻擊，並以數字鍵12345來切換技能。  
 
