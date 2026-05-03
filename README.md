@@ -1,5 +1,7 @@
 # 🐒 Monkey Battle 🐒
 
+[English] | [繁體中文](README.zh-TW.md)
+
 This game is inspired by the **MapleStory** fan-made game **Maple Cut**. It uses mouse clicks to attack and the number keys 1, 2, 3, 4, 5 to switch skills.  
 
 The game content is inspired by the author's university life. Since the author studied at the "Monkey University" in Kaohsiung, they often had to deal with monkeys in daily life, and classmates were frequently bullied by them.  
