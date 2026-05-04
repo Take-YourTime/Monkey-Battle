@@ -210,6 +210,38 @@ class HealText(pygame.sprite.Sprite):
             self.image.set_alpha(int(self.opacity))
 
 
+class DamageText(pygame.sprite.Sprite):
+    """
+    浮動傷害數字特效：顯示紅色 -X 傷害並向上浮動淡出。
+    """
+    def __init__(self, location, amount: int):
+        super().__init__()
+        font       = pygame.font.SysFont("arial", 28, bold=True)
+        text_surf  = font.render(f"-{amount}", True, (255, 50, 50))
+        outline    = font.render(f"-{amount}", True, (50, 0, 0))
+        w, h       = text_surf.get_size()
+        self.image = pygame.Surface((w + 2, h + 2), pygame.SRCALPHA)
+        self.image.blit(outline, (1, 1))
+        self.image.blit(outline, (1, -1))
+        self.image.blit(outline, (-1, 1))
+        self.image.blit(outline, (-1, -1))
+        self.image.blit(text_surf, (1, 1))
+        self.rect    = self.image.get_rect(center=location)
+        self.y       = float(self.rect.y)
+        self.opacity = 255.0
+
+    def update(self, delta_time):
+        time_step     = delta_time * REFERENCE_FPS
+        self.y       -= 1.2 * time_step
+        self.rect.y   = int(self.y)
+        self.opacity -= 5.0 * time_step
+        if self.opacity <= 0:
+            self.kill()
+        else:
+            self.image.set_alpha(int(self.opacity))
+
+
+
 class MotorcycleExplosion(AnimatedEffect):
     """
     機車命中爆炸特效：使用 AI 生成的爆炸 sprite（或程式碼繪製備用）。

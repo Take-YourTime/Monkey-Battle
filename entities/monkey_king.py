@@ -38,7 +38,8 @@ class MonkeyKing(Entity):
         self.mask = pygame.mask.from_surface(self.raw_image)
         self.width = self.raw_image.get_width()
         self.height = self.raw_image.get_height()
-        self.life = settings["life"]
+        self.max_life = settings["life"]
+        self.life = self.max_life
         self.energy_limit = settings["energy_limit"]
         self._atk_sound_played = False
         self._banana_thrown = False

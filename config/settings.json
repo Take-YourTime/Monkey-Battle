@@ -45,7 +45,7 @@
       "motorcycle": {
         "ap_cost_ratio": 0.75,
         "mp_cost_ratio": 0.75,
-        "damage": 50,
+        "damage": 20,
         "unlock_level": 15,
         "cooldown": 30
       }

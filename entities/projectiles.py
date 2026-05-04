@@ -34,7 +34,7 @@ class Pencil(Projectile):
         self.multiple = 13
         self.time = 0.0
         
-    def update(self, delta_time, enemies_groups, obstacles_groups, pencilFolded_group):
+    def update(self, delta_time, enemies_groups, obstacles_groups, pencilFolded_group, damage_text_group=None):
         time_step = delta_time * REFERENCE_FPS
         if self.time > 35:
             self.multiple = 15
@@ -70,7 +70,10 @@ class Pencil(Projectile):
                     self.hit_sound.play()
                     pencilFolded_group.add(PencilFolded(self.rect.topleft, self.angle))
                     self.kill()
-                    enemy.hurt() # Using standard hurt() interface
+                    actual_dmg = enemy.hurt() # Using standard hurt() interface
+                    if actual_dmg > 0 and damage_text_group is not None:
+                        from effects.animations import DamageText
+                        damage_text_group.add(DamageText(enemy.rect.midtop, actual_dmg))
                     return
         
         for obstacle_group in obstacles_groups:
@@ -128,7 +131,7 @@ class Book(Projectile):
 
         self._hit_sound = rm.get_sound("player/sound/book_hit.wav", 0.7)
 
-    def update(self, delta_time, enemy_groups, bullet_groups, book_hit_group):
+    def update(self, delta_time, enemy_groups, bullet_groups, book_hit_group, damage_text_group=None):
         """
         enemy_groups  : 可被重擊的敵人群組列表（不含 MonkeyKing）
         bullet_groups : 可被消除的子彈群組列表（stone, banana, seed）
@@ -171,7 +174,10 @@ class Book(Projectile):
                 if self.is_colliding_with(enemy):
                     self._hit_sound.play()
                     book_hit_group.add(BookHit(self.rect.center))
-                    enemy.hurt(self.damage)
+                    actual_dmg = enemy.hurt(self.damage)
+                    if actual_dmg > 0 and damage_text_group is not None:
+                        from effects.animations import DamageText
+                        damage_text_group.add(DamageText(enemy.rect.midtop, actual_dmg))
                     if hasattr(enemy, "stun"):
                         enemy.stun(self.stun_dur)
                     self.kill()
@@ -206,7 +212,7 @@ class Motorcycle(Projectile):
         self.multiple  = self.SPEED
         self.damage    = cfg["damage"]
 
-    def update(self, delta_time, all_enemy_groups, explosion_group):
+    def update(self, delta_time, all_enemy_groups, explosion_group, damage_text_group=None):
         from effects.animations import MotorcycleExplosion
         time_step = delta_time * REFERENCE_FPS
 
@@ -228,7 +234,10 @@ class Motorcycle(Projectile):
             for enemy in rect_hits:
                 if self.is_colliding_with(enemy):
                     explosion_group.add(MotorcycleExplosion(self.rect.center))
-                    enemy.hurt(self.damage)
+                    actual_dmg = enemy.hurt(self.damage)
+                    if actual_dmg > 0 and damage_text_group is not None:
+                        from effects.animations import DamageText
+                        damage_text_group.add(DamageText(enemy.rect.midtop, actual_dmg))
                     rm = ResourceManager.get_instance()
                     rm.get_sound("player/sound/motorcycle_bomb.wav", 0.8).play()
                     self.kill()

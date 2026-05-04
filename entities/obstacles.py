@@ -79,7 +79,7 @@ class DeskObstacle(pygame.sprite.Sprite):
         self.rect.bottom  = bt
 
     # ─────────────────────────────────────────────────────────
-    def update(self, delta_time, enemy_groups_to_damage, damage: int):
+    def update(self, delta_time, enemy_groups_to_damage, damage: int, damage_text_group=None):
         """
         delta_time             : 幀間隔秒數
         enemy_groups_to_damage : 動畫結束瞬間造成傷害的群組列表
@@ -105,7 +105,11 @@ class DeskObstacle(pygame.sprite.Sprite):
                 for grp in enemy_groups_to_damage:
                     hits = pygame.sprite.spritecollide(self, grp, False)
                     for enemy in hits:
-                        enemy.hurt(damage)
+                        actual_dmg = enemy.hurt(damage)
+                        if actual_dmg > 0 and damage_text_group is not None:
+                            from effects.animations import DamageText
+                            damage_text_group.add(DamageText(enemy.rect.midtop, actual_dmg))
+
             elif img_idx == 1:
                 self.image = self._frames[img_idx]
             else:
@@ -123,9 +127,11 @@ class DeskObstacle(pygame.sprite.Sprite):
     # ─────────────────────────────────────────────────────────
     def hurt(self, damage: int = 1):
         """供近戰攻擊或子彈命中呼叫，扣除 HP。"""
+        actual_damage = min(self.hp, damage)
         self.hp -= damage
         if self.hp <= 0:
             self.kill()
+        return actual_damage
 
     def hit(self):
         """子彈命中時呼叫（子彈在 game_page 中已被消除）：扣 1 HP。"""

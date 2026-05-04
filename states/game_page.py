@@ -46,6 +46,10 @@ class GameState(StateBase):
         self.motorcycle_group  = pygame.sprite.Group()
         self.explosion_group   = pygame.sprite.Group()
         self.heal_text_group   = pygame.sprite.Group()  # 休息回血浮動文字
+        self.damage_text_group = pygame.sprite.Group()  # 傷害浮動文字
+
+        # HP render font
+        self.hp_font = pygame.font.SysFont("arial", 14, bold=True)
 
         # Monsters
         self.magician_group    = pygame.sprite.Group()
@@ -124,7 +128,7 @@ class GameState(StateBase):
             self.pencil_group, self.pencilFolded_group,
             self.book_group, self.bookHit_group,
             self.desk_group, self.motorcycle_group, self.explosion_group,
-            self.heal_text_group,
+            self.heal_text_group, self.damage_text_group,
             self.magician_group, self.stone_group,
             self.monkeyKing_group, self.banana_group, self.bananaHit_group,
             self.bigWhiteMonkey_group, self.seed_group, self.seedHit_group,
@@ -272,6 +276,7 @@ class GameState(StateBase):
              self.monkey_group, self.angelMonkey_group, self.bigWhiteMonkey_group],
             [self.stone_group, self.banana_group, self.seed_group],  # 鉛筆不被課桌椅阻擋
             self.pencilFolded_group,
+            self.damage_text_group
         )
         self.pencilFolded_group.update(delta_time)
 
@@ -281,7 +286,7 @@ class GameState(StateBase):
                                 self.monkeyKing_group]
         _book_bullet_groups = [self.stone_group, self.banana_group, self.seed_group]
         for book in list(self.book_group):
-            book.update(delta_time, _book_enemy_groups, _book_bullet_groups, self.bookHit_group)
+            book.update(delta_time, _book_enemy_groups, _book_bullet_groups, self.bookHit_group, self.damage_text_group)
 
         self.bookHit_group.update(delta_time)
 
@@ -296,6 +301,7 @@ class GameState(StateBase):
                  self.monkeyKing_group, self.bigWhiteMonkey_group,
                  self.magician_group],
                 cfg_desk["damage"],
+                self.damage_text_group
             )
 
         # 課桌椅阻擋子彈（石頭、香蕉、種子）
@@ -313,7 +319,7 @@ class GameState(StateBase):
             self.magician_group,
         ]
         for moto in list(self.motorcycle_group):
-            moto.update(delta_time, _moto_enemy_groups, self.explosion_group)
+            moto.update(delta_time, _moto_enemy_groups, self.explosion_group, self.damage_text_group)
         self.explosion_group.update(delta_time)
 
         # ── 更新怪物 ──────────────────────────────────────────
@@ -351,6 +357,7 @@ class GameState(StateBase):
             )
             self.player.pending_heal_amount = 0   # 清除，避免重複觸發
         self.heal_text_group.update(delta_time)
+        self.damage_text_group.update(delta_time)
 
     # ─────────────────────────────────────────────────────────────
     def draw(self, surface):
@@ -389,8 +396,25 @@ class GameState(StateBase):
         # ── HUD ──────────────────────────────────────────────
         self.hud.draw(surface, self.player)
 
-        # 休息浮動文字（絕對 HUD 之上）
+        # 顯示怪物血量
+        for group in [self.magician_group, self.monkey_group, self.monkeyKing_group, self.angelMonkey_group, self.bigWhiteMonkey_group]:
+            for monster in group:
+                max_l = getattr(monster, 'max_life', monster.max_life)
+                if max_l > 0:
+                    hp_str = f"HP: {int(monster.life)}/{int(max_l)}"
+                    text_surf = self.hp_font.render(hp_str, True, (255, 100, 100))
+                    outline_surf = self.hp_font.render(hp_str, True, (0, 0, 0))
+                    text_rect = text_surf.get_rect(midbottom=(monster.rect.centerx, monster.rect.top - 5))
+                    
+                    surface.blit(outline_surf, (text_rect.x - 1, text_rect.y))
+                    surface.blit(outline_surf, (text_rect.x + 1, text_rect.y))
+                    surface.blit(outline_surf, (text_rect.x, text_rect.y - 1))
+                    surface.blit(outline_surf, (text_rect.x, text_rect.y + 1))
+                    surface.blit(text_surf, text_rect)
+
+        # 浮動文字（絕對頂層）
         self.heal_text_group.draw(surface)
+        self.damage_text_group.draw(surface)
 
         # ── 死亡黑幕 ──────────────────────────────────────────
         if self._death_overlay_active or self._death_waiting_click:

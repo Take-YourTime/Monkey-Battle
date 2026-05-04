@@ -42,7 +42,8 @@ class Monkey(Entity):
         self.x = float(location_x)
         self.width = self.raw_image.get_width()
         self.height = self.raw_image.get_height()
-        self.life = settings["life"]
+        self.max_life = settings["life"]
+        self.life = self.max_life
         
     def stun(self, duration: float):
         """施加重擊，強制取消攻擊動畫並停止行動。"""
@@ -112,7 +113,8 @@ class Monkey(Entity):
     
 
     def hurt(self, damage=1):
-        if self.isDying: return
+        if self.isDying: return 0
+        actual_damage = min(self.life, damage)
         if self.life > damage:
             self.life -= damage
         else:
@@ -121,6 +123,7 @@ class Monkey(Entity):
             self.stun_timer = 0.0
             # Clear mask to prevent further projectile collisions while dying
             self.mask = pygame.Mask(self.mask.get_size())
+        return actual_damage
 
     # monkey attack
     def attack(self):

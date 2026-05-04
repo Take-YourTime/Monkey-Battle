@@ -10,11 +10,13 @@ class Entity(pygame.sprite.Sprite):
         self.life = 1
         
     def hurt(self, damage=1):
+        actual_damage = min(self.life, damage)
         if self.life > damage:
             self.life -= damage
         else:
             self.life = 0
             self.kill()
+        return actual_damage
 
 class Projectile(pygame.sprite.Sprite):
     """

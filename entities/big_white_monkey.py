@@ -47,8 +47,9 @@ class BigWhiteMonkey(Entity):
 
     def hurt(self, damage=1):
         if self.state == "die":
-            return
+            return 0
         self.stun_timer = 0.0    # 受傷清除重擊
+        actual_damage = min(self.life, damage)
         self.life -= damage
         if self.life <= 0:
             self.life = 0
@@ -64,6 +65,7 @@ class BigWhiteMonkey(Entity):
             self.state = "jumpAttack"
             self.index = 0.0
             self._jump_hit_done = False
+        return actual_damage
 
     def stun(self, duration: float):
         """施加重擊，強制取消攻擊動畫並停止行動。"""

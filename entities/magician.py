@@ -21,7 +21,8 @@ class Magician(Entity):
         self.mask = pygame.mask.from_surface(self.image)
         self.width = width
         self.height = height
-        self.life = settings["life"]
+        self.max_life = settings["life"]
+        self.life = self.max_life
         self.skill_energy = 0.0
         self.skill_consume = random.randint(settings["skill_consume_min"], settings["skill_consume_max"])
         self.move_times = float(random.randint(settings["move_times_min"], settings["move_times_max"]))
