@@ -10,7 +10,7 @@ The campus was practically **invaded** by monkeys, which sparked the fun idea of
 Based on this concept, the author created this game.  
 
 The game is written using Python 3 and the Pygame library, and its development was divided into two stages:  
-> 1. Originally made in **July, 2024**. This stage was entirely hard-coded from scratch without using any AI tools. Link to the 2024 project:   
+> 1. Originally made in **July, 2024**. This stage was entirely hard-coded from scratch without using any AI tools. Link to the 2024 project: https://github.com/Take-YourTime/Pygame-Project/tree/main/Monkey%20Battle  
 > 2. In **March, 2026**, following the rise of Vibe Coding, AI tools like Antigravity were used for a second round of modifications and a complete refactoring of the project architecture to improve extensibility and maintainability.   
 
 ---
