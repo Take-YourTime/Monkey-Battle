@@ -13,6 +13,10 @@ The game is written using Python 3 and the Pygame library, and its development w
 > 1. Originally made in **July, 2024**. This stage was entirely hard-coded from scratch without using any AI tools. Link to the 2024 project: https://github.com/Take-YourTime/Pygame-Project/tree/main/Monkey%20Battle  
 > 2. In **March, 2026**, following the rise of Vibe Coding, AI tools like Antigravity were used for a second round of modifications and a complete refactoring of the project architecture to improve extensibility and maintainability.   
 
+<img src="./demoView/menu.png" width="50%" alt="menu">
+
+<img src="./demoView/game.png" width="50%" alt="game">
+
 ---
 
 ## How to Play
