@@ -231,7 +231,7 @@ https://www.youtube.com/watch?v=iLsresneRPs&list=RDiLsresneRPs&start_radio=1
     |       setting_page.py
     |   
     |
-    +---_unuse_material_\   # some resource that is not used
+    +---_unuse_material_\  (some resource that is not used)
     |
     \---__pycache__
             function.cpython-312.pyc
