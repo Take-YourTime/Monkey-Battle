@@ -232,7 +232,7 @@ https://www.youtube.com/watch?v=iLsresneRPs&list=RDiLsresneRPs&start_radio=1
     |       setting_page.py
     |   
     |
-    +---_unuse_material_\   # 部分未使用的素材資源
+    +---_unuse_material_\ (部分未使用的素材資源)
     |
     \---__pycache__
             function.cpython-312.pyc
