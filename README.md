@@ -103,6 +103,34 @@ Click on **Releases** on the right side of the GitHub page to download the lates
 
 ---
 
+## Resource Link
+### Images, Icons & Sprites
+Pixabay: https://pixabay.com/
+
+Iconify: https://icon-sets.iconify.design/
+
+PNGEgg: https://www.pngegg.com/en/search?q=maplestory
+
+MapleStory Simulator: https://maples.im/
+
+MapleStory wiki: https://maplestory.wiki/MCW/1/mob/2
+
+### Sounds
+Pixabay: https://pixabay.com/
+
+小森平免費音效: https://taira-komori.net/freesoundtw.html
+
+### BGM
+https://www.youtube.com/watch?v=7NN_k0auDWQ&list=RD7NN_k0auDWQ&start_radio=1
+
+https://www.youtube.com/watch?v=uBUfQcIhim0&list=RDuBUfQcIhim0&start_radio=1
+
+https://www.youtube.com/watch?v=2oxWDW8CpBI&list=RD2oxWDW8CpBI&start_radio=1
+
+https://www.youtube.com/watch?v=iLsresneRPs&list=RDiLsresneRPs&start_radio=1
+
+---
+
 ## File Structure
 ```
 \---Monkey Battle
