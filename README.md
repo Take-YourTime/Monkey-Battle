@@ -113,7 +113,7 @@ PNGEgg: https://www.pngegg.com/en/search?q=maplestory
 
 MapleStory Simulator: https://maples.im/
 
-MapleStory wiki: https://maplestory.wiki/MCW/1/mob/2
+MapleStory Wiki: https://maplestory.wiki/MCW/1/mob/2
 
 ### Sounds
 Pixabay: https://pixabay.com/
