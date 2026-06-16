@@ -22,9 +22,9 @@ The game is written using Python 3 and the Pygame library, and its development w
 
 ## How to Play
 
-1 2 3 4 5: Switch skills
+**1 2 3 4 5**: Switch skills
 
-Left Mouse Button: Cast skills
+**Left Mouse Button**: Cast skills
 
 ---
 
